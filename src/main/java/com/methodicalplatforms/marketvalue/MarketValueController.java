@@ -1,5 +1,7 @@
 package com.methodicalplatforms.marketvalue;
 
+import com.methodicalplatforms.marketvalue.request.MarketRentRequest;
+import com.methodicalplatforms.marketvalue.response.MarketRentResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +19,7 @@ public class MarketValueController {
     }
 
     @GetMapping
-    public MarketRentResponse calculateMarketRent() {
-        return marketValueService.calculateMarketRent();
+    public MarketRentResponse calculateMarketRent(MarketRentRequest marketRentRequest) {
+        return marketValueService.calculateMarketRent(marketRentRequest);
     }
 }
