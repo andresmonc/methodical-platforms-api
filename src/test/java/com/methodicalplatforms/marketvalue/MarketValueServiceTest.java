@@ -42,6 +42,7 @@ class MarketValueServiceTest {
 
         var marketRentMonths = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType);
         assertEquals(4, marketRentMonths.size());
+        assertEquals(0, BigDecimal.valueOf(1100).compareTo(marketRentMonths.get(0).getMarketRent()));
     }
 
     @Test
@@ -72,9 +73,11 @@ class MarketValueServiceTest {
 
         var marketRentMonths1 = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType1);
         assertEquals(4, marketRentMonths1.size());
+        assertEquals(0, BigDecimal.valueOf(1100).compareTo(marketRentMonths1.get(0).getMarketRent()));
 
         var marketRentMonths2 = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType2);
         assertEquals(3, marketRentMonths2.size());
+        assertEquals(0, BigDecimal.valueOf(1100).compareTo(marketRentMonths2.get(0).getMarketRent()));
     }
 
     @Test
