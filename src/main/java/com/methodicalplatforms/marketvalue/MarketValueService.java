@@ -2,6 +2,7 @@ package com.methodicalplatforms.marketvalue;
 
 import com.methodicalplatforms.marketvalue.request.EscalationMonth;
 import com.methodicalplatforms.marketvalue.request.MarketRentRequest;
+import com.methodicalplatforms.marketvalue.request.UnitTypeEscalationData;
 import com.methodicalplatforms.marketvalue.response.MarketRentMonth;
 import com.methodicalplatforms.marketvalue.response.MarketRentResponse;
 import com.methodicalplatforms.marketvalue.response.MarketRentYear;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class MarketValueService {
 
     public MarketRentResponse calculateMarketRent(MarketRentRequest marketRentRequest) {
-        Map<String, List<MarketRentMonth>> unitTypeMarketRentsByMonth = getMonthlyMarketRentsByUnitType(marketRentRequest.getMarketRent(), marketRentRequest.getEscalationMonths());
+        Map<String, List<MarketRentMonth>> unitTypeMarketRentsByMonth = getMonthlyMarketRentsForAllUnitTypes(marketRentRequest.getUnitTypeEscalationDataList());
 
         MarketRentResponse.MarketRentResponseBuilder marketResponseBuilder = MarketRentResponse.builder();
         if (marketRentRequest.isYearlySummaryEnabled()) {
@@ -30,27 +31,36 @@ public class MarketValueService {
         return marketResponseBuilder.build();
     }
 
-    private Map<String, List<MarketRentMonth>> getMonthlyMarketRentsByUnitType(BigDecimal startingMarketRent, List<EscalationMonth> escalationMonths) {
+    private Map<String, List<MarketRentMonth>> getMonthlyMarketRentsForAllUnitTypes(List<UnitTypeEscalationData> unitTypeEscalationDataList) {
         // maintain order which we received
         Map<String, List<MarketRentMonth>> unitTypeMarketRentsByMonth = new LinkedHashMap<>();
 
-        BigDecimal currentMarketRent = startingMarketRent;
-
-        for (EscalationMonth escalationMonth : escalationMonths) {
-            String unitType = escalationMonth.getUnitType();
-            // If unit type not in map initialize it
-            if (!unitTypeMarketRentsByMonth.containsKey(escalationMonth.getUnitType())) {
-                unitTypeMarketRentsByMonth.put(unitType, new ArrayList<>());
-            }
-
-            // Calculate the market rent for the month in question
-            MarketRentMonth marketRentMonth = calculateMarketRentMonth(escalationMonth, currentMarketRent);
-            // Fetch the list of market rents for the specific unit type and append the new calc
-            unitTypeMarketRentsByMonth.get(unitType).add(marketRentMonth);
-            currentMarketRent = marketRentMonth.getMarketRent();
-        }
+        // Loop through all unit types and calculate the market rent per month
+        unitTypeEscalationDataList.forEach(unitTypeEscalationData -> {
+            List<MarketRentMonth> marketRentByMonthForUnitType = calculateMonthlyMarketRentsByIndividualUnitType(unitTypeEscalationData);
+            unitTypeMarketRentsByMonth.put(unitTypeEscalationData.getUnitType(), marketRentByMonthForUnitType);
+        });
 
         return unitTypeMarketRentsByMonth;
+    }
+
+    private List<MarketRentMonth> calculateMonthlyMarketRentsByIndividualUnitType(UnitTypeEscalationData unitTypeEscalationData) {
+        // maintain order which we received
+        List<MarketRentMonth> marketRentsByMonth = new ArrayList<>();
+        // Track the market rent for the unit type
+        BigDecimal marketValue = unitTypeEscalationData.getStartingMarketValue();
+
+
+        for (EscalationMonth escalationMonth : unitTypeEscalationData.getEscalationMonthData()) {
+            // Calculate the market rent for the month in question
+            MarketRentMonth marketRentMonth = calculateMarketRentMonth(escalationMonth, marketValue);
+
+            // Update the tracker for current market rents for the unit type
+            marketRentsByMonth.add(marketRentMonth);
+            marketValue = marketRentMonth.getMarketRent();
+        }
+
+        return marketRentsByMonth;
     }
 
     private MarketRentMonth calculateMarketRentMonth(EscalationMonth escalationMonth, BigDecimal currentMarketRent) {
