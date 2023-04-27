@@ -9,6 +9,6 @@ import java.util.Map;
 @Data
 @Builder
 public class MarketRentResponse {
-    Map<String, List<MarketRentMonth>> unitTypeMarketRentMonths;
-    Map<String, List<MarketRentYear>> unitTypeMarketRentYears;
+    private Map<String, List<MarketRentMonth>> unitTypeMarketRentMonths;
+    private Map<String, List<MarketRentYear>> unitTypeMarketRentYears;
 }
