@@ -39,6 +39,9 @@ class MarketValueServiceTest {
 
         assertNotNull(marketValueResponse);
         assertEquals(1, marketValueResponse.getUnitTypeMarketRentMonths().size());
+
+        var marketRentMonths = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType);
+        assertEquals(4, marketRentMonths.size());
     }
 
     @Test
@@ -55,8 +58,7 @@ class MarketValueServiceTest {
                         // Second Unit
                         EscalationMonth.builder().unitType(unitType2).month(0).escalationRate(BigDecimal.valueOf(.10)).build(),
                         EscalationMonth.builder().unitType(unitType2).month(1).escalationRate(BigDecimal.ZERO).build(),
-                        EscalationMonth.builder().unitType(unitType2).month(2).escalationRate(BigDecimal.ZERO).build(),
-                        EscalationMonth.builder().unitType(unitType2).month(3).escalationRate(BigDecimal.ZERO).build()
+                        EscalationMonth.builder().unitType(unitType2).month(2).escalationRate(BigDecimal.ZERO).build()
                 ))
                 .yearlySummaryEnabled(false)
                 .marketRent(BigDecimal.valueOf(1000))
@@ -67,6 +69,12 @@ class MarketValueServiceTest {
 
         assertNotNull(marketValueResponse);
         assertEquals(2, marketValueResponse.getUnitTypeMarketRentMonths().size());
+
+        var marketRentMonths1 = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType1);
+        assertEquals(4, marketRentMonths1.size());
+
+        var marketRentMonths2 = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType2);
+        assertEquals(3, marketRentMonths2.size());
     }
 
     @Test
