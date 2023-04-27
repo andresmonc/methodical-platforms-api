@@ -56,21 +56,21 @@ class MarketValueServiceTest {
         var unitType2 = "2 BR 2 BATH";
         var request = createMarketRentRequest(
                 false,
+                // First Unit
                 UnitTypeEscalationData.builder()
                         .unitType(unitType1)
                         .startingMarketValue(BigDecimal.valueOf(1000))
                         .escalationMonthData(List.of(
-                                // First Unit
                                 EscalationMonth.builder().month(0).escalationRate(BigDecimal.valueOf(.10)).build(),
                                 EscalationMonth.builder().month(1).escalationRate(BigDecimal.ZERO).build(),
                                 EscalationMonth.builder().month(2).escalationRate(BigDecimal.ZERO).build(),
                                 EscalationMonth.builder().month(3).escalationRate(BigDecimal.ZERO).build()
                         )).build(),
+                // Second Unit
                 UnitTypeEscalationData.builder()
                         .unitType(unitType2)
                         .startingMarketValue(BigDecimal.valueOf(2000))
                         .escalationMonthData(List.of(
-                                // Second Unit
                                 EscalationMonth.builder().month(0).escalationRate(BigDecimal.valueOf(.10)).build(),
                                 EscalationMonth.builder().month(1).escalationRate(BigDecimal.ZERO).build(),
                                 EscalationMonth.builder().month(2).escalationRate(BigDecimal.ZERO).build())).build()
@@ -94,22 +94,22 @@ class MarketValueServiceTest {
     @Test
     void calculateMarketRentYearlySummarySingleUnitType() {
         var unitType = "1 BR 1 BATH";
-        var request = MarketRentRequest.builder().yearlySummaryEnabled(true).unitTypeEscalationDataList(
-                List.of(
-                        UnitTypeEscalationData.builder()
-                                .unitType(unitType)
-                                .startingMarketValue(BigDecimal.valueOf(1000))
-                                .escalationMonthData(
-                                        List.of(
-                                                EscalationMonth.builder().month(0).escalationRate(BigDecimal.valueOf(.10)).build(),
-                                                EscalationMonth.builder().month(1).escalationRate(BigDecimal.ZERO).build(),
-                                                EscalationMonth.builder().month(2).escalationRate(BigDecimal.ZERO).build(),
-                                                EscalationMonth.builder().month(3).escalationRate(BigDecimal.ZERO).build()
-                                        )
+        var request = createMarketRentRequest(
+                true,
+                UnitTypeEscalationData.builder()
+                        .unitType(unitType)
+                        .startingMarketValue(BigDecimal.valueOf(1000))
+                        .escalationMonthData(
+                                List.of(
+                                        EscalationMonth.builder().month(0).escalationRate(BigDecimal.valueOf(.10)).build(),
+                                        EscalationMonth.builder().month(1).escalationRate(BigDecimal.ZERO).build(),
+                                        EscalationMonth.builder().month(2).escalationRate(BigDecimal.ZERO).build(),
+                                        EscalationMonth.builder().month(3).escalationRate(BigDecimal.ZERO).build()
                                 )
-                                .build()
-                )
-        ).build();
+                        )
+                        .build()
+
+        );
 
         var marketValueResponse = marketValueService.calculateMarketRent(request);
 
@@ -126,30 +126,28 @@ class MarketValueServiceTest {
     void calculateMarketRentYearlySummaryMultipleUnitType() {
         var unitType1 = "1 BR 1 BATH";
         var unitType2 = "2 BR 2 BATH";
-        var request = MarketRentRequest.builder()
-                .unitTypeEscalationDataList(List.of(
-                        UnitTypeEscalationData.builder()
-                                .unitType(unitType1)
-                                .startingMarketValue(BigDecimal.valueOf(1000))
-                                .escalationMonthData(List.of(
-                                        // First Unit
-                                        EscalationMonth.builder().month(0).escalationRate(BigDecimal.valueOf(.10)).build(),
-                                        EscalationMonth.builder().month(1).escalationRate(BigDecimal.ZERO).build(),
-                                        EscalationMonth.builder().month(2).escalationRate(BigDecimal.ZERO).build(),
-                                        EscalationMonth.builder().month(3).escalationRate(BigDecimal.ZERO).build()
-                                )).build(),
-                        UnitTypeEscalationData.builder()
-                                .unitType(unitType2)
-                                .startingMarketValue(BigDecimal.valueOf(2000))
-                                .escalationMonthData(List.of(
-                                        // Second Unit
-                                        EscalationMonth.builder().month(0).escalationRate(BigDecimal.valueOf(.10)).build(),
-                                        EscalationMonth.builder().month(1).escalationRate(BigDecimal.ZERO).build(),
-                                        EscalationMonth.builder().month(2).escalationRate(BigDecimal.ZERO).build())).build()
+        var request = createMarketRentRequest(
+                true,
+                UnitTypeEscalationData.builder()
+                        .unitType(unitType1)
+                        .startingMarketValue(BigDecimal.valueOf(1000))
+                        .escalationMonthData(List.of(
+                                // First Unit
+                                EscalationMonth.builder().month(0).escalationRate(BigDecimal.valueOf(.10)).build(),
+                                EscalationMonth.builder().month(1).escalationRate(BigDecimal.ZERO).build(),
+                                EscalationMonth.builder().month(2).escalationRate(BigDecimal.ZERO).build(),
+                                EscalationMonth.builder().month(3).escalationRate(BigDecimal.ZERO).build()
+                        )).build(),
+                UnitTypeEscalationData.builder()
+                        .unitType(unitType2)
+                        .startingMarketValue(BigDecimal.valueOf(2000))
+                        .escalationMonthData(List.of(
+                                // Second Unit
+                                EscalationMonth.builder().month(0).escalationRate(BigDecimal.valueOf(.10)).build(),
+                                EscalationMonth.builder().month(1).escalationRate(BigDecimal.ZERO).build(),
+                                EscalationMonth.builder().month(2).escalationRate(BigDecimal.ZERO).build())).build()
 
-                ))
-                .yearlySummaryEnabled(true)
-                .build();
+        );
 
         var marketValueResponse = marketValueService.calculateMarketRent(request);
 
