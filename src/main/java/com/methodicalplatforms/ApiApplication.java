@@ -1,4 +1,4 @@
-package com.methodicalplatforms.api;
+package com.methodicalplatforms;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
