@@ -1,0 +1,38 @@
+{
+  "unitTypeMarketRentMonths": {
+    "1 BR 1 BATH": [
+      {
+        "year": 0,
+        "month": 1,
+        "marketRent": 1050.0000
+      },
+      {
+        "year": 0,
+        "month": 2,
+        "marketRent": 1050.000000
+      },
+      {
+        "year": 0,
+        "month": 3,
+        "marketRent": 1102.50000000
+      }
+    ],
+    "2 BR 1 BATH": [
+      {
+        "year": 0,
+        "month": 1,
+        "marketRent": 2100.0000
+      },
+      {
+        "year": 0,
+        "month": 2,
+        "marketRent": 2100.000000
+      },
+      {
+        "year": 0,
+        "month": 3,
+        "marketRent": 2205.00000000
+      }
+    ]
+  }
+}

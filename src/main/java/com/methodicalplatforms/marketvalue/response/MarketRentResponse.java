@@ -1,5 +1,6 @@
 package com.methodicalplatforms.marketvalue.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,6 +9,7 @@ import java.util.Map;
 
 @Data
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MarketRentResponse {
     private Map<String, List<MarketRentMonth>> unitTypeMarketRentMonths;
     private Map<String, List<MarketRentYear>> unitTypeMarketRentYears;

@@ -10,5 +10,4 @@ import java.util.List;
 public class MarketRentRequest {
     private boolean yearlySummaryEnabled;
     private List<UnitTypeEscalationData> unitTypeEscalationDataList;
-
 }

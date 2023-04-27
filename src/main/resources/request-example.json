@@ -1,0 +1,47 @@
+{
+  "yearlySummaryEnabled": true,
+  "unitTypeEscalationDataList": [
+    {
+      "unitType": "1 BR 1 BATH",
+      "escalationMonthData": [
+        {
+          "month": 1,
+          "year": 0,
+          "escalationRate": 0.05
+        },
+        {
+          "month": 2,
+          "year": 0,
+          "escalationRate": 0.00
+        },
+        {
+          "month": 3,
+          "year": 0,
+          "escalationRate": 0.05
+        }
+      ],
+      "startingMarketValue": 1000.00
+    },
+    {
+      "unitType": "2 BR 1 BATH",
+      "escalationMonthData": [
+        {
+          "month": 1,
+          "year": 0,
+          "escalationRate": 0.05
+        },
+        {
+          "month": 2,
+          "year": 0,
+          "escalationRate": 0.00
+        },
+        {
+          "month": 3,
+          "year": 0,
+          "escalationRate": 0.05
+        }
+      ],
+      "startingMarketValue": 2000.00
+    }
+  ]
+}
