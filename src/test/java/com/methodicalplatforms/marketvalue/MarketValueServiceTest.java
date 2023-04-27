@@ -172,4 +172,5 @@ class MarketValueServiceTest {
                 .unitTypeEscalationDataList(List.of(unitTypeEscalationDataList))
                 .build();
     }
+
 }
