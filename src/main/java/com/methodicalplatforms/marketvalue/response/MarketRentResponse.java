@@ -11,8 +11,4 @@ import java.util.Map;
 public class MarketRentResponse {
     Map<String, List<MarketRentMonth>> unitTypeMarketRentMonths;
     Map<String, List<MarketRentYear>> unitTypeMarketRentYears;
-
-
-    List<MarketRentMonth> marketRentMonths;
-    List<MarketRentYear> marketRentYears;
 }
