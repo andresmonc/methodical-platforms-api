@@ -1,7 +1,8 @@
 package com.methodicalplatforms.marketvalue;
 
 import com.methodicalplatforms.marketvalue.request.EscalationMonth;
-import com.methodicalplatforms.marketvalue.request.MarketRentRequest;
+import com.methodicalplatforms.marketvalue.request.RentOptions;
+import com.methodicalplatforms.marketvalue.request.RentRequest;
 import com.methodicalplatforms.marketvalue.request.UnitTypeEscalationData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -166,9 +167,11 @@ class MarketValueServiceTest {
     }
 
 
-    private MarketRentRequest createMarketRentRequest(boolean yearlySummaryEnabled, UnitTypeEscalationData... unitTypeEscalationDataList) {
-        return MarketRentRequest.builder()
-                .yearlySummaryEnabled(yearlySummaryEnabled)
+    private RentRequest createMarketRentRequest(boolean yearlySummaryEnabled, UnitTypeEscalationData... unitTypeEscalationDataList) {
+        return RentRequest.builder()
+                .options(RentOptions.builder()
+                        .summarizeByYear(yearlySummaryEnabled)
+                        .build())
                 .unitTypeEscalationDataList(List.of(unitTypeEscalationDataList))
                 .build();
     }

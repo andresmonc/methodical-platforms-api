@@ -4,11 +4,19 @@
       {
         "year": 0,
         "marketValue": 3202.50000000
+      },
+      {
+        "year": 1,
+        "marketValue": 6405.00000000
       }
     ],
     "2 BR 1 BATH": [
       {
         "year": 0,
+        "marketValue": 6405.00000000
+      },
+      {
+        "year": 1,
         "marketValue": 6405.00000000
       }
     ]

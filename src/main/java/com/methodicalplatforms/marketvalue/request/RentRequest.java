@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class MarketRentRequest {
-    private boolean yearlySummaryEnabled;
+public class RentRequest {
+    private RentOptions options;
     private List<UnitTypeEscalationData> unitTypeEscalationDataList;
 }

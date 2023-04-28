@@ -1,7 +1,7 @@
 package com.methodicalplatforms.marketvalue;
 
 import com.methodicalplatforms.marketvalue.request.EscalationMonth;
-import com.methodicalplatforms.marketvalue.request.MarketRentRequest;
+import com.methodicalplatforms.marketvalue.request.RentRequest;
 import com.methodicalplatforms.marketvalue.request.UnitTypeEscalationData;
 import com.methodicalplatforms.marketvalue.response.MarketRentMonth;
 import com.methodicalplatforms.marketvalue.response.MarketRentResponse;
@@ -17,11 +17,11 @@ import java.util.Map;
 @Service
 public class MarketValueService {
 
-    public MarketRentResponse calculateMarketRent(MarketRentRequest marketRentRequest) {
-        Map<String, List<MarketRentMonth>> unitTypeMarketRentsByMonth = getMonthlyMarketRentsForAllUnitTypes(marketRentRequest.getUnitTypeEscalationDataList());
+    public MarketRentResponse calculateMarketRent(RentRequest rentRequest) {
+        Map<String, List<MarketRentMonth>> unitTypeMarketRentsByMonth = getMonthlyMarketRentsForAllUnitTypes(rentRequest.getUnitTypeEscalationDataList());
 
         MarketRentResponse.MarketRentResponseBuilder marketResponseBuilder = MarketRentResponse.builder();
-        if (marketRentRequest.isYearlySummaryEnabled()) {
+        if (rentRequest.getOptions() != null && rentRequest.getOptions().getSummarizeByYear()) {
             Map<String, List<MarketRentYear>> yearSummaryByUnitType = summarizeYearsForUnitTypes(unitTypeMarketRentsByMonth);
             marketResponseBuilder.unitTypeMarketRentYears(yearSummaryByUnitType);
         } else {
