@@ -11,6 +11,6 @@ import java.util.Map;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MarketRentResponse {
-    private Map<String, List<MarketRentMonth>> unitTypeMarketRentMonths;
-    private Map<String, List<MarketRentYear>> unitTypeMarketRentYears;
+    private Map<String, List<RentMonth>> unitTypeMarketRentMonths;
+    private Map<String, List<RentYear>> unitTypeMarketRentYears;
 }

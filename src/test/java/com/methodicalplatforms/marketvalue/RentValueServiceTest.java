@@ -13,13 +13,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class MarketValueServiceTest {
+class RentValueServiceTest {
 
-    public MarketValueService marketValueService;
+    public RentValueService rentValueService;
 
     @BeforeEach
     public void setup() {
-        marketValueService = new MarketValueService();
+        rentValueService = new RentValueService();
     }
 
     @Test
@@ -41,7 +41,7 @@ class MarketValueServiceTest {
                         .build()
         );
 
-        var marketValueResponse = marketValueService.calculateMarketRent(request);
+        var marketValueResponse = rentValueService.calculateMarketRent(request);
 
         assertNotNull(marketValueResponse);
         assertEquals(1, marketValueResponse.getUnitTypeMarketRentMonths().size());
@@ -78,7 +78,7 @@ class MarketValueServiceTest {
 
         );
 
-        var marketValueResponse = marketValueService.calculateMarketRent(request);
+        var marketValueResponse = rentValueService.calculateMarketRent(request);
 
         assertNotNull(marketValueResponse);
         assertEquals(2, marketValueResponse.getUnitTypeMarketRentMonths().size());
@@ -112,7 +112,7 @@ class MarketValueServiceTest {
 
         );
 
-        var marketValueResponse = marketValueService.calculateMarketRent(request);
+        var marketValueResponse = rentValueService.calculateMarketRent(request);
 
         assertNotNull(marketValueResponse);
         assertEquals(1, marketValueResponse.getUnitTypeMarketRentYears().size());
@@ -150,7 +150,7 @@ class MarketValueServiceTest {
 
         );
 
-        var marketValueResponse = marketValueService.calculateMarketRent(request);
+        var marketValueResponse = rentValueService.calculateMarketRent(request);
 
         assertNotNull(marketValueResponse);
         assertEquals(2, marketValueResponse.getUnitTypeMarketRentYears().size());

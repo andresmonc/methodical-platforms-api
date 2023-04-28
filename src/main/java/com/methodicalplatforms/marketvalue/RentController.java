@@ -10,34 +10,34 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/market-values")
-public class MarketValueController {
+public class RentController {
 
-    private final MarketValueService marketValueService;
+    private final RentValueService rentValueService;
 
     @Autowired
-    public MarketValueController(MarketValueService marketValueService) {
-        this.marketValueService = marketValueService;
+    public RentController(RentValueService rentValueService) {
+        this.rentValueService = rentValueService;
     }
 
     @GetMapping("/yearly")
     public MarketRentResponse getRentsYearly(@RequestBody RentRequest rentRequest) {
-        return marketValueService.calculateMarketRent(rentRequest);
+        return rentValueService.calculateMarketRent(rentRequest);
     }
 
 
     @GetMapping("/monthly")
     public MarketRentResponse getRentsMonthly(@RequestBody RentRequest rentRequest) {
-        return marketValueService.calculateMarketRent(rentRequest);
+        return rentValueService.calculateMarketRent(rentRequest);
     }
 
     @GetMapping("/yearly/summary")
     public MarketRentResponse getYearlyRentSummary(@RequestBody RentRequest rentRequest) {
-        return marketValueService.calculateMarketRent(rentRequest);
+        return rentValueService.calculateMarketRent(rentRequest);
     }
 
 
     @GetMapping("/monthly/summary")
     public MarketRentResponse getMonthlyRentSummary(@RequestBody RentRequest rentRequest) {
-        return marketValueService.calculateMarketRent(rentRequest);
+        return rentValueService.calculateMarketRent(rentRequest);
     }
 }

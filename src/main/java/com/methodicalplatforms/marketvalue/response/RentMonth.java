@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
-public class MarketRentMonth {
+public class RentMonth {
     private int year;
     private int month;
     private BigDecimal marketRent;
