@@ -4,7 +4,7 @@ import com.methodicalplatforms.marketvalue.request.EscalationMonth;
 import com.methodicalplatforms.marketvalue.request.RentRequest;
 import com.methodicalplatforms.marketvalue.request.UnitTypeEscalationData;
 import com.methodicalplatforms.marketvalue.response.RentMonth;
-import com.methodicalplatforms.marketvalue.response.MarketRentResponse;
+import com.methodicalplatforms.marketvalue.response.RentResponse;
 import com.methodicalplatforms.marketvalue.response.RentYear;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +17,10 @@ import java.util.Map;
 @Service
 public class RentValueService {
 
-    public MarketRentResponse calculateMarketRent(RentRequest rentRequest) {
+    public RentResponse calculateMarketRent(RentRequest rentRequest) {
         Map<String, List<RentMonth>> unitTypeMarketRentsByMonth = getMonthlyMarketRentsForAllUnitTypes(rentRequest.getUnitTypeEscalationDataList());
 
-        MarketRentResponse.MarketRentResponseBuilder marketResponseBuilder = MarketRentResponse.builder();
+        RentResponse.RentResponseBuilder marketResponseBuilder = RentResponse.builder();
         if (rentRequest.getOptions() != null && rentRequest.getOptions().getSummarizeByYear()) {
             Map<String, List<RentYear>> yearSummaryByUnitType = summarizeYearsForUnitTypes(unitTypeMarketRentsByMonth);
             marketResponseBuilder.unitTypeMarketRentYears(yearSummaryByUnitType);

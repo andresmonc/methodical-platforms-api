@@ -1,7 +1,7 @@
 package com.methodicalplatforms.marketvalue;
 
 import com.methodicalplatforms.marketvalue.request.RentRequest;
-import com.methodicalplatforms.marketvalue.response.MarketRentResponse;
+import com.methodicalplatforms.marketvalue.response.RentResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,24 +20,24 @@ public class RentController {
     }
 
     @GetMapping("/yearly")
-    public MarketRentResponse getRentsYearly(@RequestBody RentRequest rentRequest) {
+    public RentResponse getRentsYearly(@RequestBody RentRequest rentRequest) {
         return rentValueService.calculateMarketRent(rentRequest);
     }
 
 
     @GetMapping("/monthly")
-    public MarketRentResponse getRentsMonthly(@RequestBody RentRequest rentRequest) {
+    public RentResponse getRentsMonthly(@RequestBody RentRequest rentRequest) {
         return rentValueService.calculateMarketRent(rentRequest);
     }
 
     @GetMapping("/yearly/summary")
-    public MarketRentResponse getYearlyRentSummary(@RequestBody RentRequest rentRequest) {
+    public RentResponse getYearlyRentSummary(@RequestBody RentRequest rentRequest) {
         return rentValueService.calculateMarketRent(rentRequest);
     }
 
 
     @GetMapping("/monthly/summary")
-    public MarketRentResponse getMonthlyRentSummary(@RequestBody RentRequest rentRequest) {
+    public RentResponse getMonthlyRentSummary(@RequestBody RentRequest rentRequest) {
         return rentValueService.calculateMarketRent(rentRequest);
     }
 }

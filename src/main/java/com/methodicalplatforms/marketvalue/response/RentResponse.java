@@ -10,7 +10,7 @@ import java.util.Map;
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class MarketRentResponse {
+public class RentResponse {
     private Map<String, List<RentMonth>> unitTypeMarketRentMonths;
     private Map<String, List<RentYear>> unitTypeMarketRentYears;
 }
