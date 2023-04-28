@@ -12,3 +12,5 @@ public class RentMonth {
     private int month;
     private BigDecimal marketRent;
 }
+
+

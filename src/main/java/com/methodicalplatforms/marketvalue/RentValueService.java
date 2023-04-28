@@ -1,6 +1,7 @@
 package com.methodicalplatforms.marketvalue;
 
 import com.methodicalplatforms.marketvalue.request.EscalationMonth;
+import com.methodicalplatforms.marketvalue.request.RentOptions;
 import com.methodicalplatforms.marketvalue.request.RentRequest;
 import com.methodicalplatforms.marketvalue.request.UnitTypeEscalationData;
 import com.methodicalplatforms.marketvalue.response.RentMonth;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,19 +19,66 @@ import java.util.Map;
 @Service
 public class RentValueService {
 
+    private static final String ALL_UNITS = "ALL UNITS";
+
     public RentResponse calculateMarketRent(RentRequest rentRequest) {
-        Map<String, List<RentMonth>> unitTypeMarketRentsByMonth = getMonthlyMarketRentsForAllUnitTypes(rentRequest.getUnitTypeEscalationDataList());
+        Map<String, List<RentMonth>> rentByMonths = getMonthlyMarketRentsForAllUnitTypes(rentRequest.getUnitTypeEscalationDataList());
 
         RentResponse.RentResponseBuilder marketResponseBuilder = RentResponse.builder();
-        if (rentRequest.getOptions() != null && rentRequest.getOptions().getSummarizeByYear()) {
-            Map<String, List<RentYear>> yearSummaryByUnitType = summarizeYearsForUnitTypes(unitTypeMarketRentsByMonth);
-            marketResponseBuilder.unitTypeMarketRentYears(yearSummaryByUnitType);
+        RentOptions options = rentRequest.getOptions();
+        if (options != null && rentRequest.getOptions().getSummarizeByYear()) {
+            // Summarize by Year
+            Map<String, List<RentYear>> rentByYears = summarizeYearsForUnitTypes(rentByMonths);
+            if (options.getSummarizeByUnitType()) {
+                // Summarize by unit type
+                rentByYears = yearlySummaryByUnitType(rentByYears);
+            }
+            marketResponseBuilder.unitTypeMarketRentYears(rentByYears);
         } else {
-            marketResponseBuilder.unitTypeMarketRentMonths(unitTypeMarketRentsByMonth);
+            if (options.getSummarizeByUnitType()) {
+                // Summarize by unit type
+                rentByMonths = monthlySummaryByUnitType(rentByMonths);
+            }
+            marketResponseBuilder.unitTypeMarketRentMonths(rentByMonths);
         }
 
         return marketResponseBuilder.build();
     }
+
+    private Map<String, List<RentMonth>> monthlySummaryByUnitType(Map<String, List<RentMonth>> rentMonthsByUnitType) {
+        Map<String, RentMonth> totalRentMonths = new HashMap<>();
+        rentMonthsByUnitType.forEach((unityType, unitRentMonths) -> {
+            unitRentMonths.forEach(unitRentMonth -> {
+                String key = unitRentMonth.getMonth() + "-" + unitRentMonth.getYear();
+                if (!totalRentMonths.containsKey(key)) {
+                    totalRentMonths.put(key, unitRentMonth);
+                } else {
+                    RentMonth rentMonth = totalRentMonths.get(key);
+                    rentMonth.setMarketRent(rentMonth.getMarketRent().add(unitRentMonth.getMarketRent()));
+                }
+            });
+        });
+
+        return Map.of(ALL_UNITS, new ArrayList<>(totalRentMonths.values()));
+    }
+
+    private Map<String, List<RentYear>> yearlySummaryByUnitType(Map<String, List<RentYear>> rentYearsByUnitType) {
+        Map<Integer, RentYear> totalsForRentYears = new HashMap<>();
+        rentYearsByUnitType.forEach((unityType, unitRentMonths) -> {
+            unitRentMonths.forEach(unitRentYear -> {
+                Integer year = unitRentYear.getYear();
+                if (!totalsForRentYears.containsKey(year)) {
+                    totalsForRentYears.put(year, unitRentYear);
+                } else {
+                    RentYear rentYear = totalsForRentYears.get(year);
+                    rentYear.setMarketRent(rentYear.getMarketRent().add(unitRentYear.getMarketRent()));
+                }
+            });
+        });
+
+        return Map.of(ALL_UNITS, new ArrayList<>(totalsForRentYears.values()));
+    }
+
 
     private Map<String, List<RentMonth>> getMonthlyMarketRentsForAllUnitTypes(List<UnitTypeEscalationData> unitTypeEscalationDataList) {
         // maintain order which we received
@@ -97,12 +146,12 @@ public class RentValueService {
 
             // If year doesn't exist in linked map then initialize it
             if (!yearMarketValue.containsKey(rentMonth.getYear())) {
-                yearMarketValue.put(year, RentYear.builder().year(year).marketValue(BigDecimal.ZERO).build());
+                yearMarketValue.put(year, RentYear.builder().year(year).marketRent(BigDecimal.ZERO).build());
             }
 
             // Update market value for year
-            BigDecimal newMarketRentValue = yearMarketValue.get(year).getMarketValue().add(marketRentForMonth);
-            yearMarketValue.get(year).setMarketValue(newMarketRentValue);
+            BigDecimal newMarketRentValue = yearMarketValue.get(year).getMarketRent().add(marketRentForMonth);
+            yearMarketValue.get(year).setMarketRent(newMarketRentValue);
         }
         return new ArrayList<>(yearMarketValue.values());
     }

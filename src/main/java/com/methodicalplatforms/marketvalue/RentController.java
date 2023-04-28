@@ -19,25 +19,9 @@ public class RentController {
         this.rentValueService = rentValueService;
     }
 
-    @GetMapping("/yearly")
+    @GetMapping
     public RentResponse getRentsYearly(@RequestBody RentRequest rentRequest) {
         return rentValueService.calculateMarketRent(rentRequest);
     }
 
-
-    @GetMapping("/monthly")
-    public RentResponse getRentsMonthly(@RequestBody RentRequest rentRequest) {
-        return rentValueService.calculateMarketRent(rentRequest);
-    }
-
-    @GetMapping("/yearly/summary")
-    public RentResponse getYearlyRentSummary(@RequestBody RentRequest rentRequest) {
-        return rentValueService.calculateMarketRent(rentRequest);
-    }
-
-
-    @GetMapping("/monthly/summary")
-    public RentResponse getMonthlyRentSummary(@RequestBody RentRequest rentRequest) {
-        return rentValueService.calculateMarketRent(rentRequest);
-    }
 }

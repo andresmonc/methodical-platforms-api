@@ -9,5 +9,5 @@ import java.math.BigDecimal;
 @Builder
 public class RentYear {
     private int year;
-    private BigDecimal marketValue;
+    private BigDecimal marketRent;
 }

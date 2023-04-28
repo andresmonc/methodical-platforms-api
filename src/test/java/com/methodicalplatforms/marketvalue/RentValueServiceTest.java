@@ -119,7 +119,7 @@ class RentValueServiceTest {
 
         var unitType1MarketYear = marketValueResponse.getUnitTypeMarketRentYears().get(unitType);
         assertEquals(1, unitType1MarketYear.size());
-        var year0MarketValue = unitType1MarketYear.get(0).getMarketValue();
+        var year0MarketValue = unitType1MarketYear.get(0).getMarketRent();
         assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(4400)));
     }
 
@@ -157,12 +157,12 @@ class RentValueServiceTest {
 
         var unitType1MarketYear = marketValueResponse.getUnitTypeMarketRentYears().get(unitType1);
         assertEquals(1, unitType1MarketYear.size());
-        var year0MarketValue = unitType1MarketYear.get(0).getMarketValue();
+        var year0MarketValue = unitType1MarketYear.get(0).getMarketRent();
         assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(4400)));
 
         var unitType2MarketYear = marketValueResponse.getUnitTypeMarketRentYears().get(unitType2);
         assertEquals(1, unitType2MarketYear.size());
-        year0MarketValue = unitType2MarketYear.get(0).getMarketValue();
+        year0MarketValue = unitType2MarketYear.get(0).getMarketRent();
         assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(6600)));
     }
 
