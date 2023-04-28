@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class RentValueService {
@@ -47,51 +47,46 @@ public class RentValueService {
 
     private Map<String, List<RentMonth>> monthlySummaryByUnitType(Map<String, List<RentMonth>> rentMonthsByUnitType) {
         Map<String, RentMonth> totalRentMonths = new HashMap<>();
-        rentMonthsByUnitType.forEach((unityType, unitRentMonths) -> {
-            unitRentMonths.forEach(unitRentMonth -> {
-                String key = unitRentMonth.getMonth() + "-" + unitRentMonth.getYear();
-                if (!totalRentMonths.containsKey(key)) {
-                    totalRentMonths.put(key, unitRentMonth);
-                } else {
-                    RentMonth rentMonth = totalRentMonths.get(key);
-                    rentMonth.setMarketRent(rentMonth.getMarketRent().add(unitRentMonth.getMarketRent()));
-                }
-            });
-        });
+        rentMonthsByUnitType.values().stream()
+                .flatMap(List::stream)
+                .forEach(unitRentMonth -> totalRentMonths.merge(
+                        unitRentMonth.getMonth() + "-" + unitRentMonth.getYear(),
+                        unitRentMonth,
+                        (oldRentMonth, newRentMonth) -> {
+                            oldRentMonth.setMarketRent(oldRentMonth.getMarketRent().add(newRentMonth.getMarketRent()));
+                            return oldRentMonth;
+                        }));
 
         return Map.of(ALL_UNITS, new ArrayList<>(totalRentMonths.values()));
     }
 
     private Map<String, List<RentYear>> yearlySummaryByUnitType(Map<String, List<RentYear>> rentYearsByUnitType) {
         Map<Integer, RentYear> totalsForRentYears = new HashMap<>();
-        rentYearsByUnitType.forEach((unityType, unitRentMonths) -> {
-            unitRentMonths.forEach(unitRentYear -> {
-                Integer year = unitRentYear.getYear();
-                if (!totalsForRentYears.containsKey(year)) {
-                    totalsForRentYears.put(year, unitRentYear);
-                } else {
-                    RentYear rentYear = totalsForRentYears.get(year);
-                    rentYear.setMarketRent(rentYear.getMarketRent().add(unitRentYear.getMarketRent()));
-                }
-            });
-        });
+        rentYearsByUnitType.values().stream()
+                .flatMap(List::stream)
+                .forEach(unitRentYear -> totalsForRentYears.merge(
+                        unitRentYear.getYear(),
+                        unitRentYear,
+                        (oldRentYear, newRentYear) -> {
+                            oldRentYear.setMarketRent(oldRentYear.getMarketRent().add(newRentYear.getMarketRent()));
+                            return oldRentYear;
+                        }));
 
         return Map.of(ALL_UNITS, new ArrayList<>(totalsForRentYears.values()));
     }
 
 
     private Map<String, List<RentMonth>> getMonthlyMarketRentsForAllUnitTypes(List<UnitTypeEscalationData> unitTypeEscalationDataList) {
-        // maintain order which we received
-        Map<String, List<RentMonth>> unitTypeMarketRentsByMonth = new LinkedHashMap<>();
-
-        // Loop through all unit types and calculate the market rent per month
-        unitTypeEscalationDataList.forEach(unitTypeEscalationData -> {
-            List<RentMonth> marketRentByMonthForUnitType = calculateMonthlyMarketRentsByIndividualUnitType(unitTypeEscalationData);
-            unitTypeMarketRentsByMonth.put(unitTypeEscalationData.getUnitType(), marketRentByMonthForUnitType);
-        });
-
-        return unitTypeMarketRentsByMonth;
+        // Use a stream to iterate through the unitTypeEscalationDataList and create a map with unit type as key and monthly market rents as value
+        return unitTypeEscalationDataList.stream()
+                // The first argument to Collectors.toMap specifies the key to be used in the map
+                .collect(Collectors.toMap(
+                        UnitTypeEscalationData::getUnitType, // key is unit type
+                        this::calculateMonthlyMarketRentsByIndividualUnitType, // value is monthly market rents
+                        // This merge function resolves any key collisions by keeping the last value encountered (i.e. using the new value instead of the old value)
+                        (a, b) -> b, HashMap::new));
     }
+
 
     private List<RentMonth> calculateMonthlyMarketRentsByIndividualUnitType(UnitTypeEscalationData unitTypeEscalationData) {
         // maintain order which we received
@@ -124,8 +119,7 @@ public class RentValueService {
     }
 
     private Map<String, List<RentYear>> summarizeYearsForUnitTypes(Map<String, List<RentMonth>> marketRentMonthsByUnitType) {
-        // maintaining order which we received
-        Map<String, List<RentYear>> yearSummaryByUnitType = new LinkedHashMap<>();
+        Map<String, List<RentYear>> yearSummaryByUnitType = new HashMap<>();
 
         // Summarize the year for each unit type
         marketRentMonthsByUnitType.forEach((unitType, marketRentMonths) -> {
@@ -137,14 +131,13 @@ public class RentValueService {
     }
 
     private List<RentYear> summarizeYearsForUnitType(List<RentMonth> rentMonths) {
-        // maintaining order which we received
-        LinkedHashMap<Integer, RentYear> yearMarketValue = new LinkedHashMap<>();
+        HashMap<Integer, RentYear> yearMarketValue = new HashMap<>();
 
         for (RentMonth rentMonth : rentMonths) {
             int year = rentMonth.getYear();
             BigDecimal marketRentForMonth = rentMonth.getMarketRent();
 
-            // If year doesn't exist in linked map then initialize it
+            // If year doesn't exist in map then initialize it
             if (!yearMarketValue.containsKey(rentMonth.getYear())) {
                 yearMarketValue.put(year, RentYear.builder().year(year).marketRent(BigDecimal.ZERO).build());
             }
