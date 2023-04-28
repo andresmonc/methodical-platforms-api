@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 @Builder
 public class RentRequest {
-    private RentOptions options;
+    @Builder.Default
+    private RentOptions options = new RentOptions();
     private List<UnitTypeEscalationData> unitTypeEscalationDataList;
 }

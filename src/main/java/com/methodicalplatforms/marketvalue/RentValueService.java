@@ -35,7 +35,7 @@ public class RentValueService {
             }
             marketResponseBuilder.unitTypeMarketRentYears(rentByYears);
         } else {
-            if (options.getSummarizeByUnitType()) {
+            if (options != null && options.getSummarizeByUnitType()) {
                 // Summarize by unit type
                 rentByMonths = monthlySummaryByUnitType(rentByMonths);
             }
