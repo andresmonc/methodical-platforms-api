@@ -1,4 +1,4 @@
-package com.methodicalplatforms.marketvalue.request;
+package com.methodicalplatforms.rentforecast.request;
 
 import lombok.Builder;
 import lombok.Data;
@@ -8,8 +8,8 @@ import java.util.List;
 
 @Data
 @Builder
-public class UnitTypeEscalationData {
+public class UnitTypeForecast {
         private String unitType;
-        private List<EscalationMonth> escalationMonthData;
+        private List<ForecastMonth> forecastMonthData;
         private BigDecimal startingMarketValue;
 }

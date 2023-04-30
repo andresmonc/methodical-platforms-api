@@ -1,4 +1,4 @@
-package com.methodicalplatforms.marketvalue.request;
+package com.methodicalplatforms.rentforecast.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RentOptions {
+public class RentForecastOptions {
     @Builder.Default
     private Boolean summarizeByYear = false;
     @Builder.Default

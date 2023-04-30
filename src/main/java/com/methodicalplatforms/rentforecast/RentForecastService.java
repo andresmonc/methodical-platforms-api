@@ -1,12 +1,13 @@
-package com.methodicalplatforms.marketvalue;
+package com.methodicalplatforms.rentforecast;
 
-import com.methodicalplatforms.marketvalue.request.EscalationMonth;
-import com.methodicalplatforms.marketvalue.request.RentOptions;
-import com.methodicalplatforms.marketvalue.request.RentRequest;
-import com.methodicalplatforms.marketvalue.request.UnitTypeEscalationData;
-import com.methodicalplatforms.marketvalue.response.RentMonth;
-import com.methodicalplatforms.marketvalue.response.RentResponse;
-import com.methodicalplatforms.marketvalue.response.RentYear;
+import com.methodicalplatforms.rentforecast.request.ForecastMonth;
+import com.methodicalplatforms.rentforecast.request.RentForecastOptions;
+import com.methodicalplatforms.rentforecast.request.RentForecastRequest;
+import com.methodicalplatforms.rentforecast.request.UnitTypeForecast;
+import com.methodicalplatforms.rentforecast.response.RentForecastMonth;
+import com.methodicalplatforms.rentforecast.response.RentForecastYear;
+import com.methodicalplatforms.rentforecast.response.RentResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,18 +19,23 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class RentValueService {
+public class RentForecastService {
 
     private static final String ALL_UNITS = "ALL UNITS";
 
-    public RentResponse calculateMarketRent(RentRequest rentRequest) {
-        Map<String, List<RentMonth>> rentByMonths = getMonthlyMarketRentsForAllUnitTypes(rentRequest.getUnitTypeEscalationDataList());
+    @Autowired
+    public RentForecastService() {
+        // Since market/actual are deeply tied together we'll have a market value/actual value service for calcs in the future
+    }
+
+    public RentResponse calculateMarketRent(RentForecastRequest rentForecastRequest) {
+        Map<String, List<RentForecastMonth>> rentByMonths = getMonthlyMarketRentsForAllUnitTypes(rentForecastRequest.getUnitTypeForecastList());
 
         RentResponse.RentResponseBuilder marketResponseBuilder = RentResponse.builder();
-        RentOptions options = rentRequest.getOptions();
-        if (options != null && rentRequest.getOptions().getSummarizeByYear()) {
+        RentForecastOptions options = rentForecastRequest.getOptions();
+        if (options != null && rentForecastRequest.getOptions().getSummarizeByYear()) {
             // Summarize by Year
-            Map<String, List<RentYear>> rentByYears = summarizeYearsForUnitTypes(rentByMonths);
+            Map<String, List<RentForecastYear>> rentByYears = summarizeYearsForAllUnitTypes(rentByMonths);
             if (options.getSummarizeByUnitType()) {
                 // Summarize by unit type
                 rentByYears = yearlySummaryByUnitType(rentByYears);
@@ -47,8 +53,8 @@ public class RentValueService {
         return marketResponseBuilder.build();
     }
 
-    private Map<String, List<RentMonth>> monthlySummaryByUnitType(Map<String, List<RentMonth>> rentMonthsByUnitType) {
-        Map<String, RentMonth> totalRentMonths = new HashMap<>();
+    private Map<String, List<RentForecastMonth>> monthlySummaryByUnitType(Map<String, List<RentForecastMonth>> rentMonthsByUnitType) {
+        Map<String, RentForecastMonth> totalRentMonths = new HashMap<>();
         rentMonthsByUnitType.values().stream()
                 .flatMap(List::stream)
                 .forEach(unitRentMonth -> totalRentMonths.merge(
@@ -62,8 +68,8 @@ public class RentValueService {
         return Map.of(ALL_UNITS, new ArrayList<>(totalRentMonths.values()));
     }
 
-    private Map<String, List<RentYear>> yearlySummaryByUnitType(Map<String, List<RentYear>> rentYearsByUnitType) {
-        Map<Integer, RentYear> totalsForRentYears = new HashMap<>();
+    private Map<String, List<RentForecastYear>> yearlySummaryByUnitType(Map<String, List<RentForecastYear>> rentYearsByUnitType) {
+        Map<Integer, RentForecastYear> totalsForRentYears = new HashMap<>();
         rentYearsByUnitType.values().stream()
                 .flatMap(List::stream)
                 .forEach(unitRentYear -> totalsForRentYears.merge(
@@ -78,32 +84,32 @@ public class RentValueService {
     }
 
 
-    private Map<String, List<RentMonth>> getMonthlyMarketRentsForAllUnitTypes(List<UnitTypeEscalationData> unitTypeEscalationDataList) {
-        // Use a stream to iterate through the unitTypeEscalationDataList and create a map with unit type as key and monthly market rents as value
-        return unitTypeEscalationDataList.stream()
+    private Map<String, List<RentForecastMonth>> getMonthlyMarketRentsForAllUnitTypes(List<UnitTypeForecast> unitTypeForecastList) {
+        // Use a stream to iterate through the forecast data for each unit type and create a map with unit type as key and monthly market rents as value
+        return unitTypeForecastList.stream()
                 // The first argument to Collectors.toMap specifies the key to be used in the map
                 .collect(Collectors.toMap(
-                        UnitTypeEscalationData::getUnitType, // key is unit type
+                        UnitTypeForecast::getUnitType, // key is unit type
                         this::calculateMonthlyMarketRentsByIndividualUnitType, // value is monthly market rents
                         // This merge function resolves any key collisions by keeping the last value encountered (i.e. using the new value instead of the old value)
                         (a, b) -> b, HashMap::new));
     }
 
 
-    private List<RentMonth> calculateMonthlyMarketRentsByIndividualUnitType(UnitTypeEscalationData unitTypeEscalationData) {
-        List<RentMonth> marketRentsByMonth = new ArrayList<>();
+    private List<RentForecastMonth> calculateMonthlyMarketRentsByIndividualUnitType(UnitTypeForecast unitTypeForecast) {
+        List<RentForecastMonth> marketRentsByMonth = new ArrayList<>();
         // Track the market rent for the unit type
-        BigDecimal marketValue = unitTypeEscalationData.getStartingMarketValue();
+        BigDecimal marketValue = unitTypeForecast.getStartingMarketValue();
 
         // Sort the escalation months
-        List<EscalationMonth> sortedEscalationMonths = unitTypeEscalationData.getEscalationMonthData().stream()
-                .sorted(Comparator.comparingInt(EscalationMonth::getYear)
-                        .thenComparingInt(EscalationMonth::getMonth))
+        List<ForecastMonth> sortedForecastMonths = unitTypeForecast.getForecastMonthData().stream()
+                .sorted(Comparator.comparingInt(ForecastMonth::getYear)
+                        .thenComparingInt(ForecastMonth::getMonth))
                 .toList();
 
-        for (EscalationMonth escalationMonth : sortedEscalationMonths) {
+        for (ForecastMonth forecastMonth : sortedForecastMonths) {
             // Calculate the market rent for the month in question
-            RentMonth rentMonth = calculateMarketRentMonth(escalationMonth, marketValue);
+            RentForecastMonth rentMonth = calculateMarketRentForMonth(forecastMonth, marketValue);
 
             // Update the tracker for current market rents for the unit type
             marketRentsByMonth.add(rentMonth);
@@ -113,39 +119,39 @@ public class RentValueService {
         return marketRentsByMonth;
     }
 
-    private RentMonth calculateMarketRentMonth(EscalationMonth escalationMonth, BigDecimal currentMarketRent) {
-        BigDecimal escalationFactor = BigDecimal.ONE.add(escalationMonth.getEscalationRate());
+    private RentForecastMonth calculateMarketRentForMonth(ForecastMonth forecastMonth, BigDecimal currentMarketRent) {
+        BigDecimal escalationFactor = BigDecimal.ONE.add(forecastMonth.getEscalationRate());
         BigDecimal marketRent = currentMarketRent.multiply(escalationFactor);
 
-        return RentMonth.builder()
-                .month(escalationMonth.getMonth())
-                .year(escalationMonth.getYear())
+        return RentForecastMonth.builder()
+                .month(forecastMonth.getMonth())
+                .year(forecastMonth.getYear())
                 .marketRent(marketRent)
                 .build();
     }
 
-    private Map<String, List<RentYear>> summarizeYearsForUnitTypes(Map<String, List<RentMonth>> marketRentMonthsByUnitType) {
-        Map<String, List<RentYear>> yearSummaryByUnitType = new HashMap<>();
+    private Map<String, List<RentForecastYear>> summarizeYearsForAllUnitTypes(Map<String, List<RentForecastMonth>> marketRentMonthsByUnitType) {
+        Map<String, List<RentForecastYear>> yearSummaryByUnitType = new HashMap<>();
 
         // Summarize the year for each unit type
         marketRentMonthsByUnitType.forEach((unitType, marketRentMonths) -> {
-            List<RentYear> rentYearSummaryForUnitType = summarizeYearsForUnitType(marketRentMonths);
+            List<RentForecastYear> rentYearSummaryForUnitType = summarizeYearsForAUnitType(marketRentMonths);
             yearSummaryByUnitType.put(unitType, rentYearSummaryForUnitType);
         });
 
         return yearSummaryByUnitType;
     }
 
-    private List<RentYear> summarizeYearsForUnitType(List<RentMonth> rentMonths) {
+    private List<RentForecastYear> summarizeYearsForAUnitType(List<RentForecastMonth> rentMonths) {
         // Create a map that groups the RentMonth objects by year and sums up the market rent values for each year
         Map<Integer, BigDecimal> yearMarketValue = rentMonths.stream()
-                .collect(Collectors.groupingBy(RentMonth::getYear,
-                        Collectors.mapping(RentMonth::getMarketRent,
+                .collect(Collectors.groupingBy(RentForecastMonth::getYear,
+                        Collectors.mapping(RentForecastMonth::getMarketRent,
                                 Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))));
 
         // Convert the map to a list of RentYear objects
         return yearMarketValue.entrySet().stream()
-                .map(entry -> RentYear.builder().year(entry.getKey()).marketRent(entry.getValue()).build())
+                .map(entry -> RentForecastYear.builder().year(entry.getKey()).marketRent(entry.getValue()).build())
                 .toList();
     }
 
