@@ -32,10 +32,10 @@ class RentValueServiceTest {
                         .startingMarketValue(BigDecimal.valueOf(1000))
                         .forecastMonthData(
                                 List.of(
-                                        ForecastMonth.builder().month(0).escalationRate(BigDecimal.valueOf(.10)).build(),
-                                        ForecastMonth.builder().month(1).escalationRate(BigDecimal.ZERO).build(),
-                                        ForecastMonth.builder().month(2).escalationRate(BigDecimal.ZERO).build(),
-                                        ForecastMonth.builder().month(3).escalationRate(BigDecimal.ZERO).build()
+                                        createForecastMonth(0, 0, BigDecimal.valueOf(.10)),
+                                        createForecastMonth(0, 2, BigDecimal.ZERO),
+                                        createForecastMonth(0, 1, BigDecimal.ZERO),
+                                        createForecastMonth(0, 3, BigDecimal.ZERO)
                                 )
                         )
                         .build()
@@ -49,6 +49,7 @@ class RentValueServiceTest {
         var marketRentMonths = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType);
         assertEquals(4, marketRentMonths.size());
         assertEquals(0, BigDecimal.valueOf(1100).compareTo(marketRentMonths.get(0).getMarketRent()));
+        assertEquals(1, marketRentMonths.get(1).getMonth(), "Response is not sorted");
     }
 
     @Test
@@ -62,19 +63,20 @@ class RentValueServiceTest {
                         .unitType(unitType1)
                         .startingMarketValue(BigDecimal.valueOf(1000))
                         .forecastMonthData(List.of(
-                                ForecastMonth.builder().month(0).escalationRate(BigDecimal.valueOf(.10)).build(),
-                                ForecastMonth.builder().month(1).escalationRate(BigDecimal.ZERO).build(),
-                                ForecastMonth.builder().month(2).escalationRate(BigDecimal.ZERO).build(),
-                                ForecastMonth.builder().month(3).escalationRate(BigDecimal.ZERO).build()
+                                createForecastMonth(0, 0, BigDecimal.valueOf(.10)),
+                                createForecastMonth(0, 1, BigDecimal.ZERO),
+                                createForecastMonth(0, 2, BigDecimal.ZERO),
+                                createForecastMonth(0, 3, BigDecimal.ZERO)
                         )).build(),
                 // Second Unit
                 UnitTypeForecast.builder()
                         .unitType(unitType2)
                         .startingMarketValue(BigDecimal.valueOf(2000))
                         .forecastMonthData(List.of(
-                                ForecastMonth.builder().month(0).escalationRate(BigDecimal.valueOf(.10)).build(),
-                                ForecastMonth.builder().month(1).escalationRate(BigDecimal.ZERO).build(),
-                                ForecastMonth.builder().month(2).escalationRate(BigDecimal.ZERO).build())).build()
+                                createForecastMonth(0, 0, BigDecimal.valueOf(.10)),
+                                createForecastMonth(0, 1, BigDecimal.ZERO),
+                                createForecastMonth(0, 2, BigDecimal.ZERO)
+                        )).build()
 
         );
 
@@ -102,14 +104,13 @@ class RentValueServiceTest {
                         .startingMarketValue(BigDecimal.valueOf(1000))
                         .forecastMonthData(
                                 List.of(
-                                        ForecastMonth.builder().month(0).escalationRate(BigDecimal.valueOf(.10)).build(),
-                                        ForecastMonth.builder().month(1).escalationRate(BigDecimal.ZERO).build(),
-                                        ForecastMonth.builder().month(2).escalationRate(BigDecimal.ZERO).build(),
-                                        ForecastMonth.builder().month(3).escalationRate(BigDecimal.ZERO).build()
+                                        createForecastMonth(0, 0, BigDecimal.valueOf(.10)),
+                                        createForecastMonth(0, 1, BigDecimal.ZERO),
+                                        createForecastMonth(0, 2, BigDecimal.ZERO),
+                                        createForecastMonth(0, 3, BigDecimal.ZERO)
                                 )
                         )
                         .build()
-
         );
 
         var marketValueResponse = rentForecastService.calculateMarketRent(request);
@@ -134,20 +135,20 @@ class RentValueServiceTest {
                         .startingMarketValue(BigDecimal.valueOf(1000))
                         .forecastMonthData(List.of(
                                 // First Unit
-                                ForecastMonth.builder().month(0).escalationRate(BigDecimal.valueOf(.10)).build(),
-                                ForecastMonth.builder().month(1).escalationRate(BigDecimal.ZERO).build(),
-                                ForecastMonth.builder().month(2).escalationRate(BigDecimal.ZERO).build(),
-                                ForecastMonth.builder().month(3).escalationRate(BigDecimal.ZERO).build()
+                                createForecastMonth(0, 0, BigDecimal.valueOf(.10)),
+                                createForecastMonth(0, 1, BigDecimal.ZERO),
+                                createForecastMonth(0, 2, BigDecimal.ZERO),
+                                createForecastMonth(0, 3, BigDecimal.ZERO)
                         )).build(),
                 UnitTypeForecast.builder()
                         .unitType(unitType2)
                         .startingMarketValue(BigDecimal.valueOf(2000))
                         .forecastMonthData(List.of(
                                 // Second Unit
-                                ForecastMonth.builder().month(0).escalationRate(BigDecimal.valueOf(.10)).build(),
-                                ForecastMonth.builder().month(1).escalationRate(BigDecimal.ZERO).build(),
-                                ForecastMonth.builder().month(2).escalationRate(BigDecimal.ZERO).build())).build()
-
+                                createForecastMonth(0, 0, BigDecimal.valueOf(.10)),
+                                createForecastMonth(0, 1, BigDecimal.ZERO),
+                                createForecastMonth(0, 2, BigDecimal.ZERO)
+                        )).build()
         );
 
         var marketValueResponse = rentForecastService.calculateMarketRent(request);
@@ -174,6 +175,10 @@ class RentValueServiceTest {
                         .build())
                 .unitTypeForecastList(List.of(unitTypeForecastList))
                 .build();
+    }
+
+    private ForecastMonth createForecastMonth(int year, int month, BigDecimal escalationRate) {
+        return ForecastMonth.builder().month(month).year(year).escalationRate(escalationRate).build();
     }
 
 }
