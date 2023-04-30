@@ -146,7 +146,7 @@ public class RentValueService {
         // Convert the map to a list of RentYear objects
         return yearMarketValue.entrySet().stream()
                 .map(entry -> RentYear.builder().year(entry.getKey()).marketRent(entry.getValue()).build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
 }
