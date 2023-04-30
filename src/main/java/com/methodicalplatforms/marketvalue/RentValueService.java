@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ public class RentValueService {
             }
             marketResponseBuilder.unitTypeMarketRentYears(rentByYears);
         } else {
+            // Monthly summary
             if (options != null && options.getSummarizeByUnitType()) {
                 // Summarize by unit type
                 rentByMonths = monthlySummaryByUnitType(rentByMonths);
@@ -89,13 +91,17 @@ public class RentValueService {
 
 
     private List<RentMonth> calculateMonthlyMarketRentsByIndividualUnitType(UnitTypeEscalationData unitTypeEscalationData) {
-        // maintain order which we received
         List<RentMonth> marketRentsByMonth = new ArrayList<>();
         // Track the market rent for the unit type
         BigDecimal marketValue = unitTypeEscalationData.getStartingMarketValue();
 
+        // Sort the escalation months
+        List<EscalationMonth> sortedEscalationMonths = unitTypeEscalationData.getEscalationMonthData().stream()
+                .sorted(Comparator.comparingInt(EscalationMonth::getYear)
+                        .thenComparingInt(EscalationMonth::getMonth))
+                .toList();
 
-        for (EscalationMonth escalationMonth : unitTypeEscalationData.getEscalationMonthData()) {
+        for (EscalationMonth escalationMonth : sortedEscalationMonths) {
             // Calculate the market rent for the month in question
             RentMonth rentMonth = calculateMarketRentMonth(escalationMonth, marketValue);
 
@@ -131,21 +137,16 @@ public class RentValueService {
     }
 
     private List<RentYear> summarizeYearsForUnitType(List<RentMonth> rentMonths) {
-        HashMap<Integer, RentYear> yearMarketValue = new HashMap<>();
+        // Create a map that groups the RentMonth objects by year and sums up the market rent values for each year
+        Map<Integer, BigDecimal> yearMarketValue = rentMonths.stream()
+                .collect(Collectors.groupingBy(RentMonth::getYear,
+                        Collectors.mapping(RentMonth::getMarketRent,
+                                Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))));
 
-        for (RentMonth rentMonth : rentMonths) {
-            int year = rentMonth.getYear();
-            BigDecimal marketRentForMonth = rentMonth.getMarketRent();
-
-            // If year doesn't exist in map then initialize it
-            if (!yearMarketValue.containsKey(rentMonth.getYear())) {
-                yearMarketValue.put(year, RentYear.builder().year(year).marketRent(BigDecimal.ZERO).build());
-            }
-
-            // Update market value for year
-            BigDecimal newMarketRentValue = yearMarketValue.get(year).getMarketRent().add(marketRentForMonth);
-            yearMarketValue.get(year).setMarketRent(newMarketRentValue);
-        }
-        return new ArrayList<>(yearMarketValue.values());
+        // Convert the map to a list of RentYear objects
+        return yearMarketValue.entrySet().stream()
+                .map(entry -> RentYear.builder().year(entry.getKey()).marketRent(entry.getValue()).build())
+                .collect(Collectors.toList());
     }
+
 }
