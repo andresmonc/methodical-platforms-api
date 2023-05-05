@@ -11,6 +11,7 @@ public class RentForecastMonth {
     private int year;
     private int month;
     private BigDecimal marketRent;
+    private BigDecimal actualRent;
 }
 
 

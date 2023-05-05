@@ -10,4 +10,5 @@ import java.math.BigDecimal;
 public class RentForecastYear {
     private int year;
     private BigDecimal marketRent;
+    private BigDecimal actualRent;
 }
