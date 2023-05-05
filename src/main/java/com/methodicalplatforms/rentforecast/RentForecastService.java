@@ -151,16 +151,23 @@ public class RentForecastService {
     }
 
     private List<RentForecastYear> summarizeYearsForAUnitType(List<RentForecastMonth> rentMonths) {
-        // Create a map that groups the RentMonth objects by year and sums up the market rent values for each year
-        Map<Integer, BigDecimal> yearMarketValue = rentMonths.stream()
-                .collect(Collectors.groupingBy(RentForecastMonth::getYear,
-                        Collectors.mapping(RentForecastMonth::getMarketRent,
-                                Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))));
+        Map<Integer, RentForecastYear> yearSummaries = new HashMap<>();
+        rentMonths.forEach(rentForecastMonth -> {
+            int year = rentForecastMonth.getYear();
+            if (!yearSummaries.containsKey(year)) {
+                yearSummaries.put(year, RentForecastYear.builder()
+                        .year(year)
+                        .actualRent(BigDecimal.ZERO)
+                        .marketRent(BigDecimal.ZERO)
+                        .build());
+            }
+            var yearSummary = yearSummaries.get(year);
+            yearSummary.setMarketRent(yearSummary.getMarketRent().add(rentForecastMonth.getMarketRent()));
+            yearSummary.setActualRent(yearSummary.getActualRent().add(rentForecastMonth.getActualRent()));
+        });
 
         // Convert the map to a list of RentYear objects
-        return yearMarketValue.entrySet().stream()
-                .map(entry -> RentForecastYear.builder().year(entry.getKey()).marketRent(entry.getValue()).build())
-                .toList();
+        return yearSummaries.values().stream().toList();
     }
 
 }
