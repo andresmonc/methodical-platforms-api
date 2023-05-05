@@ -11,5 +11,6 @@ import java.util.List;
 public class UnitTypeForecast {
         private String unitType;
         private List<ForecastMonth> forecastMonthData;
-        private BigDecimal startingMarketValue;
+        private BigDecimal startingMarketRent;
+        private BigDecimal startingActualRent;
 }

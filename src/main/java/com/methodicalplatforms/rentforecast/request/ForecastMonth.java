@@ -10,5 +10,6 @@ import java.math.BigDecimal;
 public class ForecastMonth {
     public int month;
     public int year;
-    public BigDecimal escalationRate;
+    public BigDecimal marketEscalationRate;
+    public BigDecimal actualEscalationRate;
 }
