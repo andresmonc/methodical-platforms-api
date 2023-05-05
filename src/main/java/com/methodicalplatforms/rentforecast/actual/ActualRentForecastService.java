@@ -16,9 +16,12 @@ public class ActualRentForecastService {
     }
 
     public BigDecimal calculateActualRentForMonth(ForecastMonth forecastMonth, BigDecimal currentActualRent) {
-        BigDecimal escalationFactor = BigDecimal.ONE.add(
-                Optional.ofNullable(forecastMonth.getActualEscalationRate()).orElse(BigDecimal.ZERO)
-        );
-        return Optional.ofNullable(currentActualRent).orElse(BigDecimal.ZERO).multiply(escalationFactor);
+        BigDecimal escalationFactor = Optional.ofNullable(forecastMonth.getActualEscalationRate())
+                .orElse(BigDecimal.ZERO)
+                .add(BigDecimal.ONE);
+        return Optional
+                .ofNullable(currentActualRent).
+                orElse(BigDecimal.ZERO)
+                .multiply(escalationFactor);
     }
 }
