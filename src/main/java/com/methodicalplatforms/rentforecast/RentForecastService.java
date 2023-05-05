@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -105,8 +106,8 @@ public class RentForecastService {
     private List<RentForecastMonth> calculateMonthlyMarketRentsByIndividualUnitType(UnitTypeForecast unitTypeForecast) {
         List<RentForecastMonth> marketRentsByMonth = new ArrayList<>();
         // Track the market rent for the unit type
-        BigDecimal marketRent = unitTypeForecast.getStartingMarketRent();
-        BigDecimal actualRent = unitTypeForecast.getStartingActualRent();
+        BigDecimal marketRent = Optional.ofNullable(unitTypeForecast.getStartingMarketRent()).orElse(BigDecimal.ZERO);;
+        BigDecimal actualRent = Optional.ofNullable(unitTypeForecast.getStartingActualRent()).orElse(BigDecimal.ZERO);
         BigDecimal lossToLease = marketRent.subtract(actualRent);
 
         // Sort the escalation months
