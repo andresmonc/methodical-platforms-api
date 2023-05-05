@@ -1,5 +1,7 @@
 package com.methodicalplatforms.rentforecast;
 
+import com.methodicalplatforms.rentforecast.actual.ActualRentForecastService;
+import com.methodicalplatforms.rentforecast.market.MarketRentForecastService;
 import com.methodicalplatforms.rentforecast.request.ForecastMonth;
 import com.methodicalplatforms.rentforecast.request.RentForecastOptions;
 import com.methodicalplatforms.rentforecast.request.RentForecastRequest;
@@ -19,7 +21,7 @@ class RentValueServiceTest {
 
     @BeforeEach
     public void setup() {
-        rentForecastService = new RentForecastService();
+        rentForecastService = new RentForecastService(new ActualRentForecastService(), new MarketRentForecastService());
     }
 
     @Test

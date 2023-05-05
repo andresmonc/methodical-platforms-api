@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Service
 public class ActualRentForecastService {
@@ -15,7 +16,9 @@ public class ActualRentForecastService {
     }
 
     public BigDecimal calculateActualRentForMonth(ForecastMonth forecastMonth, BigDecimal currentActualRent) {
-        BigDecimal escalationFactor = BigDecimal.ONE.add(forecastMonth.getActualEscalationRate());
-        return currentActualRent.multiply(escalationFactor);
+        BigDecimal escalationFactor = BigDecimal.ONE.add(
+                Optional.ofNullable(forecastMonth.getActualEscalationRate()).orElse(BigDecimal.ZERO)
+        );
+        return Optional.ofNullable(currentActualRent).orElse(BigDecimal.ZERO).multiply(escalationFactor);
     }
 }
