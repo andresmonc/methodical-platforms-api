@@ -114,29 +114,26 @@ public class RentForecastService {
                 .toList();
 
         for (ForecastMonth forecastMonth : sortedForecastMonths) {
-            // Calculate the market rent for the month in question
-            RentForecastMonth rentMonth = forecastRentsForMonth(forecastMonth, marketRent, actualRent);
+            // Forecast rents for month in question
+            BigDecimal forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(forecastMonth, marketRent);
+            BigDecimal forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(forecastMonth, actualRent);
+
+            RentForecastMonth rentMonth = RentForecastMonth.builder()
+                    .month(forecastMonth.getMonth())
+                    .year(forecastMonth.getYear())
+                    .marketRent(forecastedMarketRent)
+                    .actualRent(forecastedActualRent)
+                    .build();
 
             // Update the tracker for current market rents for the unit type
             marketRentsByMonth.add(rentMonth);
-            marketRent = rentMonth.getMarketRent();
-            actualRent = rentMonth.getActualRent();
+            marketRent = forecastedMarketRent;
+            actualRent = forecastedActualRent;
         }
 
         return marketRentsByMonth;
     }
 
-    private RentForecastMonth forecastRentsForMonth(ForecastMonth forecastMonth, BigDecimal currentMarketRent, BigDecimal currentActualRent) {
-        BigDecimal forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(forecastMonth, currentMarketRent);
-        BigDecimal forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(forecastMonth, currentActualRent);
-
-        return RentForecastMonth.builder()
-                .month(forecastMonth.getMonth())
-                .year(forecastMonth.getYear())
-                .marketRent(forecastedMarketRent)
-                .actualRent(forecastedActualRent)
-                .build();
-    }
 
     private Map<String, List<RentForecastYear>> summarizeYearsForAllUnitTypes(Map<String, List<RentForecastMonth>> marketRentMonthsByUnitType) {
         Map<String, List<RentForecastYear>> yearSummaryByUnitType = new HashMap<>();
