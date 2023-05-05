@@ -115,7 +115,7 @@ public class RentForecastService {
 
         for (ForecastMonth forecastMonth : sortedForecastMonths) {
             // Calculate the market rent for the month in question
-            RentForecastMonth rentMonth = calculateMarketRentForMonth(forecastMonth, marketRent, actualRent);
+            RentForecastMonth rentMonth = forecastRentsForMonth(forecastMonth, marketRent, actualRent);
 
             // Update the tracker for current market rents for the unit type
             marketRentsByMonth.add(rentMonth);
@@ -126,7 +126,7 @@ public class RentForecastService {
         return marketRentsByMonth;
     }
 
-    private RentForecastMonth calculateMarketRentForMonth(ForecastMonth forecastMonth, BigDecimal currentMarketRent, BigDecimal currentActualRent) {
+    private RentForecastMonth forecastRentsForMonth(ForecastMonth forecastMonth, BigDecimal currentMarketRent, BigDecimal currentActualRent) {
         BigDecimal forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(forecastMonth, currentMarketRent);
         BigDecimal forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(forecastMonth, currentActualRent);
 
