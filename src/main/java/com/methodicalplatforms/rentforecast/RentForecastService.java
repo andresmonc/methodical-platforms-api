@@ -1,5 +1,7 @@
 package com.methodicalplatforms.rentforecast;
 
+import com.methodicalplatforms.rentforecast.actual.ActualRentForecastService;
+import com.methodicalplatforms.rentforecast.market.MarketRentForecastService;
 import com.methodicalplatforms.rentforecast.request.ForecastMonth;
 import com.methodicalplatforms.rentforecast.request.RentForecastOptions;
 import com.methodicalplatforms.rentforecast.request.RentForecastRequest;
@@ -22,10 +24,13 @@ import java.util.stream.Collectors;
 public class RentForecastService {
 
     private static final String ALL_UNITS = "ALL UNITS";
+    private final ActualRentForecastService actualRentForecastService;
+    private final MarketRentForecastService marketRentForecastService;
 
     @Autowired
-    public RentForecastService() {
-        // Since market/actual are deeply tied together we'll have a market value/actual value service for calcs in the future
+    public RentForecastService(ActualRentForecastService actualRentForecastService, MarketRentForecastService marketRentForecastService) {
+        this.actualRentForecastService = actualRentForecastService;
+        this.marketRentForecastService = marketRentForecastService;
     }
 
     public RentResponse calculateMarketRent(RentForecastRequest rentForecastRequest) {
@@ -99,7 +104,8 @@ public class RentForecastService {
     private List<RentForecastMonth> calculateMonthlyMarketRentsByIndividualUnitType(UnitTypeForecast unitTypeForecast) {
         List<RentForecastMonth> marketRentsByMonth = new ArrayList<>();
         // Track the market rent for the unit type
-        BigDecimal marketValue = unitTypeForecast.getStartingMarketRent();
+        BigDecimal marketRent = unitTypeForecast.getStartingMarketRent();
+        BigDecimal actualRent = unitTypeForecast.getStartingActualRent();
 
         // Sort the escalation months
         List<ForecastMonth> sortedForecastMonths = unitTypeForecast.getForecastMonthData().stream()
@@ -109,24 +115,26 @@ public class RentForecastService {
 
         for (ForecastMonth forecastMonth : sortedForecastMonths) {
             // Calculate the market rent for the month in question
-            RentForecastMonth rentMonth = calculateMarketRentForMonth(forecastMonth, marketValue);
+            RentForecastMonth rentMonth = calculateMarketRentForMonth(forecastMonth, marketRent, actualRent);
 
             // Update the tracker for current market rents for the unit type
             marketRentsByMonth.add(rentMonth);
-            marketValue = rentMonth.getMarketRent();
+            marketRent = rentMonth.getMarketRent();
+            actualRent = rentMonth.getActualRent();
         }
 
         return marketRentsByMonth;
     }
 
-    private RentForecastMonth calculateMarketRentForMonth(ForecastMonth forecastMonth, BigDecimal currentMarketRent) {
-        BigDecimal escalationFactor = BigDecimal.ONE.add(forecastMonth.getMarketEscalationRate());
-        BigDecimal marketRent = currentMarketRent.multiply(escalationFactor);
+    private RentForecastMonth calculateMarketRentForMonth(ForecastMonth forecastMonth, BigDecimal currentMarketRent, BigDecimal currentActualRent) {
+        BigDecimal forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(forecastMonth, currentMarketRent);
+        BigDecimal forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(forecastMonth, currentActualRent);
 
         return RentForecastMonth.builder()
                 .month(forecastMonth.getMonth())
                 .year(forecastMonth.getYear())
-                .marketRent(marketRent)
+                .marketRent(forecastedMarketRent)
+                .actualRent(forecastedActualRent)
                 .build();
     }
 
