@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -59,7 +60,7 @@ public class RentForecastService {
     }
 
     private Map<String, List<RentForecastMonth>> monthlySummaryByUnitType(Map<String, List<RentForecastMonth>> rentMonthsByUnitType) {
-        Map<String, RentForecastMonth> totalRentMonths = new HashMap<>();
+        Map<String, RentForecastMonth> totalRentMonths = new LinkedHashMap<>();
         rentMonthsByUnitType.values().stream()
                 .flatMap(List::stream)
                 .forEach(unitRentMonth -> totalRentMonths.merge(
@@ -106,6 +107,7 @@ public class RentForecastService {
         // Track the market rent for the unit type
         BigDecimal marketRent = unitTypeForecast.getStartingMarketRent();
         BigDecimal actualRent = unitTypeForecast.getStartingActualRent();
+        BigDecimal lossToLease = marketRent.subtract(actualRent);
 
         // Sort the escalation months
         List<ForecastMonth> sortedForecastMonths = unitTypeForecast.getForecastMonthData().stream()
@@ -148,7 +150,7 @@ public class RentForecastService {
     }
 
     private List<RentForecastYear> summarizeYearsForAUnitType(List<RentForecastMonth> rentMonths) {
-        Map<Integer, RentForecastYear> yearSummaries = new HashMap<>();
+        Map<Integer, RentForecastYear> yearSummaries = new LinkedHashMap<>();
         rentMonths.forEach(rentForecastMonth -> {
             int year = rentForecastMonth.getYear();
             if (!yearSummaries.containsKey(year)) {
