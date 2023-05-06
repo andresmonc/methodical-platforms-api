@@ -1,0 +1,233 @@
+{
+  "options": {
+    "summarizeByYear": false,
+    "summarizeByUnitType": false
+  },
+  "unitTypeForecastList": [
+    {
+      "unitType": "1 BR 1 BATH",
+      "forecastMonthData": [
+        {
+          "month": 1,
+          "year": 0,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 3,
+          "year": 0,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 2,
+          "year": 0,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 4,
+          "year": 0,
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.3
+        },
+        {
+          "month": 5,
+          "year": 0,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 6,
+          "year": 0,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 7,
+          "year": 0,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 8,
+          "year": 0,
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.3
+        },
+        {
+          "month": 9,
+          "year": 0,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 10,
+          "year": 0,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 11,
+          "year": 0,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 12,
+          "year": 0,
+          "marketEscalationRate": 0.04,
+          "actualEscalationRate": 0.3
+        },
+        {
+          "month": 1,
+          "year": 1,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 2,
+          "year": 1,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 3,
+          "year": 1,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 4,
+          "year": 1,
+          "marketEscalationRate": 0.04,
+          "actualEscalationRate": 0.04
+        },
+        {
+          "month": 5,
+          "year": 1,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 6,
+          "year": 1,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 7,
+          "year": 1,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 8,
+          "year": 1,
+          "marketEscalationRate": 0.04,
+          "actualEscalationRate": 0.04
+        },
+        {
+          "month": 9,
+          "year": 1,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 10,
+          "year": 1,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 11,
+          "year": 1,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 12,
+          "year": 1,
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.04
+        },
+        {
+          "month": 1,
+          "year": 2,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 2,
+          "year": 2,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 3,
+          "year": 2,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 4,
+          "year": 2,
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.03
+        },
+        {
+          "month": 5,
+          "year": 2,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 6,
+          "year": 2,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 7,
+          "year": 2,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 8,
+          "year": 2,
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.03
+        },
+        {
+          "month": 9,
+          "year": 2,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 10,
+          "year": 2,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 11,
+          "year": 2,
+          "marketEscalationRate": 0,
+          "actualEscalationRate": 0
+        },
+        {
+          "month": 12,
+          "year": 2,
+          "marketEscalationRate": 0.02,
+          "actualEscalationRate": 0.03
+        }
+      ],
+      "startingMarketRent": 1000,
+      "startingActualRent": 700,
+      "excessRentAdjustmentRate": 0.15,
+      "contractTerm": 6
+    }
+  ]
+}
