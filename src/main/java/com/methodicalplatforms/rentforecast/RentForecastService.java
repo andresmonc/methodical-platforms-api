@@ -102,7 +102,6 @@ public class RentForecastService {
                         (a, b) -> b, HashMap::new));
     }
 
-
     private List<RentForecastMonth> calculateMonthlyMarketRentsByIndividualUnitType(UnitTypeForecast unitTypeForecast) {
         List<RentForecastMonth> marketRentsByMonth = new ArrayList<>();
         // Track the rent values for the unit type
@@ -124,7 +123,7 @@ public class RentForecastService {
             compoundedActualEscalationRate = compoundedActualEscalationRate.multiply(BigDecimal.ONE.add(forecastMonth.getActualEscalationRate()));
             BigDecimal currentMonthActualEscalationRate = BigDecimal.ONE;
             // Only escalate actual if we're in a renewal month, check remainder of i/term
-            if ((i % unitTypeForecast.getContractTerm()) == 0) {
+            if (unitTypeForecast.getContractTerm() != null && (i % unitTypeForecast.getContractTerm()) == 0) {
                 currentMonthActualEscalationRate = compoundedActualEscalationRate;
             }
 

@@ -14,5 +14,5 @@ public class UnitTypeForecast {
         private BigDecimal startingMarketRent;
         private BigDecimal startingActualRent;
         public BigDecimal excessRentAdjustmentRate;
-        public int contractTerm;
+        public Integer contractTerm;
 }
