@@ -18,10 +18,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class RentValueServiceTest {
 
     public RentForecastService rentForecastService;
+    ActualRentForecastService actualRentForecastService = new ActualRentForecastService();
 
     @BeforeEach
     public void setup() {
-        rentForecastService = new RentForecastService(new ActualRentForecastService(), new MarketRentForecastService());
+        rentForecastService = new RentForecastService(actualRentForecastService, new MarketRentForecastService(actualRentForecastService));
     }
 
     @Test

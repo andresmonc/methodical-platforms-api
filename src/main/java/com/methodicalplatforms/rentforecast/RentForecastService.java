@@ -118,8 +118,8 @@ public class RentForecastService {
 
         for (ForecastMonth forecastMonth : sortedForecastMonths) {
             // Forecast rents for month in question
-            BigDecimal forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(forecastMonth, marketRent);
             BigDecimal forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(forecastMonth, actualRent);
+            BigDecimal forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(forecastMonth, marketRent, forecastedActualRent);
 
             RentForecastMonth rentMonth = RentForecastMonth.builder()
                     .month(forecastMonth.getMonth())
