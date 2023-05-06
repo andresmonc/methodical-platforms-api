@@ -23,7 +23,7 @@ class RentValueServiceTest {
 
     @BeforeEach
     public void setup() {
-        rentForecastService = new RentForecastService(actualRentForecastService, new MarketRentForecastService(actualRentForecastService));
+        rentForecastService = new RentForecastService(actualRentForecastService, new MarketRentForecastService());
     }
 
     @Test

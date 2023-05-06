@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -105,9 +105,10 @@ public class RentForecastService {
     private List<RentForecastMonth> calculateMonthlyMarketRentsByIndividualUnitType(UnitTypeForecast unitTypeForecast) {
         List<RentForecastMonth> marketRentsByMonth = new ArrayList<>();
         // Track the rent values for the unit type
-        BigDecimal marketRent = Optional.ofNullable(unitTypeForecast.getStartingMarketRent()).orElse(BigDecimal.ZERO);
-        BigDecimal actualRent = Optional.ofNullable(unitTypeForecast.getStartingActualRent()).orElse(BigDecimal.ZERO);
-        BigDecimal excessRentAdjustmentRate = Optional.ofNullable(unitTypeForecast.getExcessRentAdjustmentRate()).orElse(BigDecimal.ZERO);
+
+        BigDecimal marketRent = Objects.requireNonNullElse(unitTypeForecast.getStartingMarketRent(), BigDecimal.ZERO);
+        BigDecimal actualRent = Objects.requireNonNullElse(unitTypeForecast.getStartingActualRent(), BigDecimal.ZERO);
+        BigDecimal excessRentAdjustmentRate = Objects.requireNonNullElse(unitTypeForecast.getExcessRentAdjustmentRate(), BigDecimal.ZERO);
         BigDecimal compoundedActualEscalationRate = BigDecimal.ONE;
         // Sort the escalation months
         List<ForecastMonth> sortedForecastMonths = unitTypeForecast.getForecastMonthData().stream()
@@ -120,7 +121,11 @@ public class RentForecastService {
             ForecastMonth forecastMonth = sortedForecastMonths.get(i);
 
             // Compound actual escalation and determine actual escalation rate for this month
-            compoundedActualEscalationRate = compoundedActualEscalationRate.multiply(BigDecimal.ONE.add(forecastMonth.getActualEscalationRate()));
+            compoundedActualEscalationRate = compoundedActualEscalationRate
+                    .multiply(BigDecimal.ONE.add(
+                                    Objects.requireNonNullElse(forecastMonth.getActualEscalationRate(), BigDecimal.ZERO)
+                            )
+                    );
             BigDecimal currentMonthActualEscalationRate = BigDecimal.ONE;
             // Only escalate actual if we're in a renewal month, check remainder of i/term
             if (unitTypeForecast.getContractTerm() != null && (i % unitTypeForecast.getContractTerm()) == 0) {

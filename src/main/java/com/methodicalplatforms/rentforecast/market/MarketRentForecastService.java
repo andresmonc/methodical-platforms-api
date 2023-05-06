@@ -12,13 +12,6 @@ import static java.math.RoundingMode.HALF_EVEN;
 @Service
 public class MarketRentForecastService {
 
-    private final ActualRentForecastService actualRentForecastService;
-
-    @Autowired
-    public MarketRentForecastService(ActualRentForecastService actualRentForecastService) {
-        this.actualRentForecastService = actualRentForecastService;
-    }
-
     public BigDecimal calculateMarketRentForMonth(ForecastMonth forecastMonth, BigDecimal priorMarketRent,
                                                   BigDecimal forecastedActualRent, BigDecimal excessRateAdjustmentRate) {
         BigDecimal escalationFactor = BigDecimal.ONE.add(forecastMonth.getMarketEscalationRate());
@@ -28,7 +21,7 @@ public class MarketRentForecastService {
         if (forecastedActualRent.compareTo(BigDecimal.ZERO) != 0 && excessRateAdjustmentRate.compareTo(BigDecimal.ZERO) != 0) {
             BigDecimal lossToLeasePercent = forecastedActualRent.subtract(forecastedMarketRent).divide(forecastedActualRent, HALF_EVEN);
             // If loss to lease percent exceed set market rent to actual rent, we're now the market leader
-            if (lossToLeasePercent.compareTo(excessRateAdjustmentRate) == 1) {
+            if (lossToLeasePercent.compareTo(excessRateAdjustmentRate) > 0) {
                 forecastedMarketRent = BigDecimal.ZERO.add(forecastedActualRent);
             }
         }
