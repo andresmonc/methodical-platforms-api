@@ -110,19 +110,26 @@ public class RentForecastService {
         BigDecimal actualRent = Optional.ofNullable(unitTypeForecast.getStartingActualRent()).orElse(BigDecimal.ZERO);
         BigDecimal excessRentAdjustmentRate = Optional.ofNullable(unitTypeForecast.getExcessRentAdjustmentRate()).orElse(BigDecimal.ZERO);
         BigDecimal compoundedActualEscalationRate = BigDecimal.ONE;
-
         // Sort the escalation months
         List<ForecastMonth> sortedForecastMonths = unitTypeForecast.getForecastMonthData().stream()
                 .sorted(Comparator.comparingInt(ForecastMonth::getYear)
                         .thenComparingInt(ForecastMonth::getMonth))
                 .toList();
 
-        for (ForecastMonth forecastMonth : sortedForecastMonths) {
-            // Compound actual escalation
+        for (int i = 0; i < sortedForecastMonths.size(); i++) {
+            // Get current month
+            ForecastMonth forecastMonth = sortedForecastMonths.get(i);
+
+            // Compound actual escalation and determine actual escalation rate for this month
             compoundedActualEscalationRate = compoundedActualEscalationRate.multiply(BigDecimal.ONE.add(forecastMonth.getActualEscalationRate()));
+            BigDecimal currentMonthActualEscalationRate = BigDecimal.ONE;
+            // Only escalate actual if we're in a renewal month, check remainder of i/term
+            if ((i % unitTypeForecast.getContractTerm()) == 0) {
+                currentMonthActualEscalationRate = compoundedActualEscalationRate;
+            }
 
             // Forecast rents for month in question
-            BigDecimal forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(forecastMonth, actualRent);
+            BigDecimal forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(unitTypeForecast.getStartingActualRent(), actualRent, currentMonthActualEscalationRate);
             BigDecimal forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(forecastMonth, marketRent, forecastedActualRent, excessRentAdjustmentRate);
 
             RentForecastMonth rentMonth = RentForecastMonth.builder()
