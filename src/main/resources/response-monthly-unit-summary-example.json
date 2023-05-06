@@ -1,42 +1,22 @@
 {
   "unitTypeMarketRentMonths": {
-    "2 BR 1 BATH": [
+    "ALL UNITS": [
       {
         "year": 0,
         "month": 1,
-        "marketRent": 2100.0000000000,
+        "marketRent": 3150.0000000000,
         "actualRent": 2100.0000000000
       },
       {
         "year": 0,
         "month": 2,
-        "marketRent": 2100.0000000000,
+        "marketRent": 3150.0000000000,
         "actualRent": 2100.0000000000
       },
       {
         "year": 0,
         "month": 3,
-        "marketRent": 2205.0000000000,
-        "actualRent": 2100.0000000000
-      }
-    ],
-    "1 BR 1 BATH": [
-      {
-        "year": 0,
-        "month": 1,
-        "marketRent": 1050.0000000000,
-        "actualRent": 2100.0000000000
-      },
-      {
-        "year": 0,
-        "month": 2,
-        "marketRent": 1050.0000000000,
-        "actualRent": 2100.0000000000
-      },
-      {
-        "year": 0,
-        "month": 3,
-        "marketRent": 1102.5000000000,
+        "marketRent": 3307.5000000000,
         "actualRent": 2100.0000000000
       },
       {

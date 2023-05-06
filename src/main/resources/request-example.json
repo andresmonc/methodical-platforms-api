@@ -1,7 +1,7 @@
 {
   "options": {
-    "summarizeByYear": true,
-    "summarizeByUnitType": true
+    "summarizeByYear": false,
+    "summarizeByUnitType": false
   },
   "unitTypeForecastList": [
     {
@@ -10,165 +10,199 @@
         {
           "month": 1,
           "year": 0,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 2,
           "year": 0,
-          "escalationRate": 0.00
+          "marketEscalationRate": 0.00,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 3,
           "year": 0,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 4,
           "year": 0,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 5,
           "year": 0,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 6,
           "year": 0,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 7,
           "year": 0,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 8,
           "year": 0,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 9,
           "year": 0,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 10,
           "year": 0,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 11,
           "year": 0,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 12,
           "year": 0,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 1,
           "year": 1,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 2,
           "year": 1,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 3,
           "year": 1,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 4,
           "year": 1,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 5,
           "year": 1,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 6,
           "year": 1,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 7,
           "year": 1,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 8,
           "year": 1,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 9,
           "year": 1,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 10,
           "year": 1,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 11,
           "year": 1,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 12,
           "year": 1,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 1,
           "year": 2,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 2,
           "year": 2,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 3,
           "year": 2,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 4,
           "year": 2,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 5,
           "year": 2,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 6,
           "year": 2,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 7,
           "year": 2,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 8,
           "year": 2,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         }
       ],
-      "startingMarketValue": 1000.00
+      "contractTerm": 5,
+      "startingMarketRent": 1000.00,
+      "startingActualRent": 2000.00
     },
     {
       "unitType": "2 BR 1 BATH",
@@ -176,20 +210,25 @@
         {
           "month": 1,
           "year": 0,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 2,
           "year": 0,
-          "escalationRate": 0.00
+          "marketEscalationRate": 0.00,
+          "actualEscalationRate": 0.05
         },
         {
           "month": 3,
           "year": 0,
-          "escalationRate": 0.05
+          "marketEscalationRate": 0.05,
+          "actualEscalationRate": 0.05
         }
       ],
-      "startingMarketValue": 2000.00
+      "startingMarketRent": 2000.00,
+      "startingActualRent": 2000.00,
+      "contractTerm": 5
     }
   ]
 }

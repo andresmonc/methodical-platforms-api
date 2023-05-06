@@ -1,17 +1,10 @@
 {
   "unitTypeMarketRentYears": {
-    "2 BR 1 BATH": [
+    "ALL UNITS": [
       {
         "year": 0,
-        "marketRent": 6405.0000000000,
+        "marketRent": 22372.1265204425,
         "actualRent": 6300.0000000000
-      }
-    ],
-    "1 BR 1 BATH": [
-      {
-        "year": 0,
-        "marketRent": 15967.1265204425,
-        "actualRent": 30742.3138387152
       },
       {
         "year": 1,
