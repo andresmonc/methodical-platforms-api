@@ -39,22 +39,42 @@ class RentValueServiceTest {
                         .contractTerm(6)
                         .forecastMonthData(
                                 List.of(
-                                        createForecastMonth(0, 0, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 2, BigDecimal.ZERO, BigDecimal.ZERO),
                                         createForecastMonth(0, 1, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 3, BigDecimal.valueOf(.05), BigDecimal.valueOf(.30)),
-                                        createForecastMonth(0, 4, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(0, 3, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(0, 2, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(0, 4, BigDecimal.valueOf(.05), BigDecimal.valueOf(.30)),
                                         createForecastMonth(0, 5, BigDecimal.ZERO, BigDecimal.ZERO),
                                         createForecastMonth(0, 6, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 7, BigDecimal.valueOf(.05), BigDecimal.valueOf(.30)),
-                                        createForecastMonth(0, 8, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(0, 7, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(0, 8, BigDecimal.valueOf(.05), BigDecimal.valueOf(.30)),
                                         createForecastMonth(0, 9, BigDecimal.ZERO, BigDecimal.ZERO),
                                         createForecastMonth(0, 10, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 11, BigDecimal.valueOf(.04), BigDecimal.valueOf(.30)),
-                                        createForecastMonth(0, 12, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 13, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 14, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 15, BigDecimal.valueOf(.04), BigDecimal.valueOf(.30))
+                                        createForecastMonth(0, 11, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(0, 12, BigDecimal.valueOf(.04), BigDecimal.valueOf(.30)),
+                                        createForecastMonth(1, 1, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(1, 2, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(1, 3, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(1, 4, BigDecimal.valueOf(.04), BigDecimal.valueOf(.04)),
+                                        createForecastMonth(1, 5, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(1, 6, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(1, 7, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(1, 8, BigDecimal.valueOf(.04), BigDecimal.valueOf(.04)),
+                                        createForecastMonth(1, 9, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(1, 10, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(1, 11, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(1, 12, BigDecimal.valueOf(.05), BigDecimal.valueOf(.04)),
+                                        createForecastMonth(2, 1, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(2, 2, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(2, 3, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(2, 4, BigDecimal.valueOf(.05), BigDecimal.valueOf(.03)),
+                                        createForecastMonth(2, 5, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(2, 6, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(2, 7, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(2, 8, BigDecimal.valueOf(.05), BigDecimal.valueOf(.03)),
+                                        createForecastMonth(2, 9, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(2, 10, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(2, 11, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(2, 12, BigDecimal.valueOf(.02), BigDecimal.valueOf(.03))
                                 )
                         )
                         .build()
@@ -66,15 +86,25 @@ class RentValueServiceTest {
         assertEquals(1, marketValueResponse.getUnitTypeMarketRentMonths().size());
 
         var marketRentMonths = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType);
-        assertEquals(16, marketRentMonths.size());
+        assertEquals(36, marketRentMonths.size());
         assertEquals(0, BigDecimal.valueOf(1050.00).compareTo(marketRentMonths.get(3).getMarketRent()));
-        assertEquals(1, marketRentMonths.get(1).getMonth(), "Response is not sorted");
+        assertEquals(2, marketRentMonths.get(1).getMonth(), "Response is not sorted");
         assertEquals(0, BigDecimal.valueOf(910.00).compareTo(marketRentMonths.get(7).getActualRent()));
         assertEquals(0, BigDecimal.valueOf(1102.50).compareTo(marketRentMonths.get(7).getMarketRent()));
         assertEquals(0, BigDecimal.valueOf(910.00).compareTo(marketRentMonths.get(11).getActualRent()));
         assertEquals(0, BigDecimal.valueOf(1146.60).compareTo(marketRentMonths.get(11).getMarketRent()));
         assertEquals(0, BigDecimal.valueOf(1599.42).compareTo(marketRentMonths.get(15).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
         assertEquals(0, BigDecimal.valueOf(1537.90).compareTo(marketRentMonths.get(15).getActualRent()));
+        assertEquals(0, BigDecimal.valueOf(1663.39).compareTo(marketRentMonths.get(19).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1599.42).compareTo(marketRentMonths.get(19).getActualRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1746.56).compareTo(marketRentMonths.get(23).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1599.42).compareTo(marketRentMonths.get(23).getActualRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1833.89).compareTo(marketRentMonths.get(27).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1729.93).compareTo(marketRentMonths.get(27).getActualRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1925.58).compareTo(marketRentMonths.get(31).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1781.83).compareTo(marketRentMonths.get(31).getActualRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1964.10).compareTo(marketRentMonths.get(35).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1781.83).compareTo(marketRentMonths.get(35).getActualRent().setScale(2, RoundingMode.HALF_EVEN)));
     }
 
     @Test
