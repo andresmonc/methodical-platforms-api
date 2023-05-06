@@ -13,4 +13,5 @@ public class UnitTypeForecast {
         private List<ForecastMonth> forecastMonthData;
         private BigDecimal startingMarketRent;
         private BigDecimal startingActualRent;
+        public BigDecimal excessRentAdjustmentRate;
 }

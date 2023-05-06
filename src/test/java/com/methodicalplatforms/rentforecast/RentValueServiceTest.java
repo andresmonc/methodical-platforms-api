@@ -26,7 +26,7 @@ class RentValueServiceTest {
     }
 
     @Test
-    void calculateMarketRentMonthlySingleUnitType() {
+    void forecastRentsMonthlySingleUnitType() {
         var unitType = "1 BR 1 BATH";
         var request = createMarketRentRequest(
                 false,
@@ -34,12 +34,17 @@ class RentValueServiceTest {
                         .unitType(unitType)
                         .startingMarketRent(BigDecimal.valueOf(1000))
                         .startingActualRent(BigDecimal.valueOf(700))
+                        .excessRentAdjustmentRate(BigDecimal.valueOf(.15))
                         .forecastMonthData(
                                 List.of(
                                         createForecastMonth(0, 0, BigDecimal.valueOf(.10), BigDecimal.ZERO),
                                         createForecastMonth(0, 2, BigDecimal.ZERO, BigDecimal.ZERO),
                                         createForecastMonth(0, 1, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 3, BigDecimal.ZERO, BigDecimal.valueOf(.30))
+                                        createForecastMonth(0, 3, BigDecimal.ZERO, BigDecimal.valueOf(.30)),
+                                        createForecastMonth(0, 4, BigDecimal.valueOf(.10), BigDecimal.ZERO),
+                                        createForecastMonth(0, 5, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(0, 6, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(0, 7, BigDecimal.ZERO, BigDecimal.valueOf(.69))
                                 )
                         )
                         .build()
@@ -51,10 +56,12 @@ class RentValueServiceTest {
         assertEquals(1, marketValueResponse.getUnitTypeMarketRentMonths().size());
 
         var marketRentMonths = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType);
-        assertEquals(4, marketRentMonths.size());
+        assertEquals(8, marketRentMonths.size());
         assertEquals(0, BigDecimal.valueOf(1100).compareTo(marketRentMonths.get(0).getMarketRent()));
         assertEquals(1, marketRentMonths.get(1).getMonth(), "Response is not sorted");
         assertEquals(0, BigDecimal.valueOf(910).compareTo(marketRentMonths.get(3).getActualRent()));
+        assertEquals(0, BigDecimal.valueOf(1537.90).compareTo(marketRentMonths.get(7).getActualRent()));
+        assertEquals(0, BigDecimal.valueOf(1537.90).compareTo(marketRentMonths.get(7).getMarketRent()));
 
     }
 

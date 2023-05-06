@@ -12,5 +12,4 @@ public class ForecastMonth {
     public int year;
     public BigDecimal marketEscalationRate;
     public BigDecimal actualEscalationRate;
-    public BigDecimal excessRentAdjustmentRate;
 }

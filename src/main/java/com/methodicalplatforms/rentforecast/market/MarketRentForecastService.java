@@ -20,15 +20,15 @@ public class MarketRentForecastService {
     }
 
     public BigDecimal calculateMarketRentForMonth(ForecastMonth forecastMonth, BigDecimal priorMarketRent,
-                                                  BigDecimal forecastedActualRent) {
+                                                  BigDecimal forecastedActualRent, BigDecimal excessRateAdjustmentRate) {
         BigDecimal escalationFactor = BigDecimal.ONE.add(forecastMonth.getMarketEscalationRate());
         BigDecimal forecastedMarketRent = priorMarketRent.multiply(escalationFactor);
 
         // avoid division by zero;
-        if(forecastedActualRent.compareTo(BigDecimal.ZERO) != 0){
+        if (forecastedActualRent.compareTo(BigDecimal.ZERO) != 0 && excessRateAdjustmentRate.compareTo(BigDecimal.ZERO) != 0) {
             BigDecimal lossToLeasePercent = forecastedActualRent.subtract(forecastedMarketRent).divide(forecastedActualRent, HALF_EVEN);
             // If loss to lease percent exceed set market rent to actual rent, we're now the market leader
-            if (lossToLeasePercent.compareTo(forecastMonth.getExcessRentAdjustmentRate()) > 0) { // todo: need to figure out compare to
+            if (lossToLeasePercent.compareTo(excessRateAdjustmentRate) == 1) { // todo: need to figure out compare to
                 forecastedMarketRent = BigDecimal.ZERO.add(forecastedActualRent);
             }
         }
