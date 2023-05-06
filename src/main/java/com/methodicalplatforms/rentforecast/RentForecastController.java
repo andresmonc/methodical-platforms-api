@@ -21,7 +21,7 @@ public class RentForecastController {
 
     @PostMapping
     public RentResponse getRentsYearly(@RequestBody RentForecastRequest rentForecastRequest) {
-        return rentForecastService.calculateMarketRent(rentForecastRequest);
+        return rentForecastService.forecastRents(rentForecastRequest);
     }
 
 }

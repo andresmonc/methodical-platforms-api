@@ -80,7 +80,7 @@ class RentValueServiceTest {
                         .build()
         );
 
-        var marketValueResponse = rentForecastService.calculateMarketRent(request);
+        var marketValueResponse = rentForecastService.forecastRents(request);
 
         assertNotNull(marketValueResponse);
         assertEquals(1, marketValueResponse.getUnitTypeMarketRentMonths().size());
@@ -135,7 +135,7 @@ class RentValueServiceTest {
 
         );
 
-        var marketValueResponse = rentForecastService.calculateMarketRent(request);
+        var marketValueResponse = rentForecastService.forecastRents(request);
 
         assertNotNull(marketValueResponse);
         assertEquals(2, marketValueResponse.getUnitTypeMarketRentMonths().size());
@@ -168,7 +168,7 @@ class RentValueServiceTest {
                         .build()
         );
 
-        var marketValueResponse = rentForecastService.calculateMarketRent(request);
+        var marketValueResponse = rentForecastService.forecastRents(request);
 
         assertNotNull(marketValueResponse);
         assertEquals(1, marketValueResponse.getUnitTypeMarketRentYears().size());
@@ -206,7 +206,7 @@ class RentValueServiceTest {
                         )).build()
         );
 
-        var marketValueResponse = rentForecastService.calculateMarketRent(request);
+        var marketValueResponse = rentForecastService.forecastRents(request);
 
         assertNotNull(marketValueResponse);
         assertEquals(2, marketValueResponse.getUnitTypeMarketRentYears().size());
