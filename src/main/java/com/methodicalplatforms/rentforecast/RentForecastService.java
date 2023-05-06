@@ -105,13 +105,11 @@ public class RentForecastService {
 
     private List<RentForecastMonth> calculateMonthlyMarketRentsByIndividualUnitType(UnitTypeForecast unitTypeForecast) {
         List<RentForecastMonth> marketRentsByMonth = new ArrayList<>();
-        // Track the market rent for the unit type
+        // Track the rent values for the unit type
         BigDecimal marketRent = Optional.ofNullable(unitTypeForecast.getStartingMarketRent()).orElse(BigDecimal.ZERO);
-        ;
         BigDecimal actualRent = Optional.ofNullable(unitTypeForecast.getStartingActualRent()).orElse(BigDecimal.ZERO);
         BigDecimal excessRentAdjustmentRate = Optional.ofNullable(unitTypeForecast.getExcessRentAdjustmentRate()).orElse(BigDecimal.ZERO);
-        // todo: verify this
-        BigDecimal compoundedActualEscalationRate = BigDecimal.ZERO;
+        BigDecimal compoundedActualEscalationRate = BigDecimal.ONE;
 
         // Sort the escalation months
         List<ForecastMonth> sortedForecastMonths = unitTypeForecast.getForecastMonthData().stream()
@@ -121,7 +119,7 @@ public class RentForecastService {
 
         for (ForecastMonth forecastMonth : sortedForecastMonths) {
             // Compound actual escalation
-
+            compoundedActualEscalationRate = compoundedActualEscalationRate.multiply(BigDecimal.ONE.add(forecastMonth.getActualEscalationRate()));
 
             // Forecast rents for month in question
             BigDecimal forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(forecastMonth, actualRent);
