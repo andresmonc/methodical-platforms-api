@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,16 +36,25 @@ class RentValueServiceTest {
                         .startingMarketRent(BigDecimal.valueOf(1000))
                         .startingActualRent(BigDecimal.valueOf(700))
                         .excessRentAdjustmentRate(BigDecimal.valueOf(.15))
+                        .contractTerm(6)
                         .forecastMonthData(
                                 List.of(
-                                        createForecastMonth(0, 0, BigDecimal.valueOf(.10), BigDecimal.ZERO),
+                                        createForecastMonth(0, 0, BigDecimal.ZERO, BigDecimal.ZERO),
                                         createForecastMonth(0, 2, BigDecimal.ZERO, BigDecimal.ZERO),
                                         createForecastMonth(0, 1, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 3, BigDecimal.ZERO, BigDecimal.valueOf(.30)),
-                                        createForecastMonth(0, 4, BigDecimal.valueOf(.10), BigDecimal.ZERO),
+                                        createForecastMonth(0, 3, BigDecimal.valueOf(.05), BigDecimal.valueOf(.30)),
+                                        createForecastMonth(0, 4, BigDecimal.ZERO, BigDecimal.ZERO),
                                         createForecastMonth(0, 5, BigDecimal.ZERO, BigDecimal.ZERO),
                                         createForecastMonth(0, 6, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 7, BigDecimal.ZERO, BigDecimal.valueOf(.69))
+                                        createForecastMonth(0, 7, BigDecimal.valueOf(.05), BigDecimal.valueOf(.30)),
+                                        createForecastMonth(0, 8, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(0, 9, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(0, 10, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(0, 11, BigDecimal.valueOf(.04), BigDecimal.valueOf(.30)),
+                                        createForecastMonth(0, 12, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(0, 13, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(0, 14, BigDecimal.ZERO, BigDecimal.ZERO),
+                                        createForecastMonth(0, 15, BigDecimal.valueOf(.04), BigDecimal.valueOf(.30))
                                 )
                         )
                         .build()
@@ -56,13 +66,15 @@ class RentValueServiceTest {
         assertEquals(1, marketValueResponse.getUnitTypeMarketRentMonths().size());
 
         var marketRentMonths = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType);
-        assertEquals(8, marketRentMonths.size());
-        assertEquals(0, BigDecimal.valueOf(1100).compareTo(marketRentMonths.get(0).getMarketRent()));
+        assertEquals(16, marketRentMonths.size());
+        assertEquals(0, BigDecimal.valueOf(1050.00).compareTo(marketRentMonths.get(3).getMarketRent()));
         assertEquals(1, marketRentMonths.get(1).getMonth(), "Response is not sorted");
-        assertEquals(0, BigDecimal.valueOf(910).compareTo(marketRentMonths.get(3).getActualRent()));
-        assertEquals(0, BigDecimal.valueOf(1537.90).compareTo(marketRentMonths.get(7).getActualRent()));
-        assertEquals(0, BigDecimal.valueOf(1537.90).compareTo(marketRentMonths.get(7).getMarketRent()));
-
+        assertEquals(0, BigDecimal.valueOf(910.00).compareTo(marketRentMonths.get(7).getActualRent()));
+        assertEquals(0, BigDecimal.valueOf(1102.50).compareTo(marketRentMonths.get(7).getMarketRent()));
+        assertEquals(0, BigDecimal.valueOf(910.00).compareTo(marketRentMonths.get(11).getActualRent()));
+        assertEquals(0, BigDecimal.valueOf(1146.60).compareTo(marketRentMonths.get(11).getMarketRent()));
+        assertEquals(0, BigDecimal.valueOf(1599.42).compareTo(marketRentMonths.get(15).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1537.90).compareTo(marketRentMonths.get(15).getActualRent()));
     }
 
     @Test
