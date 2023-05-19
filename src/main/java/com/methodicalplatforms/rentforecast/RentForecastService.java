@@ -107,8 +107,8 @@ public class RentForecastService {
 
     private List<RentForecastMonth> forecastMonthlyRentsByIndividualUnitType(UnitTypeForecast unitTypeForecast) {
         List<RentForecastMonth> forecastedRentsByMonth = new ArrayList<>();
-        // Track the rent values for the unit type
 
+        // Track the rent values for the unit type
         BigDecimal marketRent = Objects.requireNonNullElse(unitTypeForecast.getStartingMarketRent(), BigDecimal.ZERO);
         BigDecimal actualRent = Objects.requireNonNullElse(unitTypeForecast.getStartingActualRent(), BigDecimal.ZERO);
         BigDecimal excessRentAdjustmentRate = Objects.requireNonNullElse(unitTypeForecast.getExcessRentAdjustmentRate(), BigDecimal.ZERO);
@@ -164,7 +164,6 @@ public class RentForecastService {
 
     private Map<String, List<RentForecastYear>> summarizeYearsForAllUnitTypes(Map<String, List<RentForecastMonth>> forecastedRentMonthsByUnitType) {
         Map<String, List<RentForecastYear>> yearSummaryByUnitType = new HashMap<>();
-
         // Summarize the year for each unit type
         forecastedRentMonthsByUnitType.forEach((unitType, forecastedRentMonths) -> {
             List<RentForecastYear> rentYearSummaryForUnitType = summarizeYearsForAUnitType(forecastedRentMonths);
