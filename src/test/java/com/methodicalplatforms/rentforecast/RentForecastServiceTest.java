@@ -16,7 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class RentValueServiceTest {
+class RentForecastServiceTest {
 
     public RentForecastService rentForecastService;
     ActualRentForecastService actualRentForecastService = new ActualRentForecastService();
@@ -87,23 +87,23 @@ class RentValueServiceTest {
 
         var marketRentMonths = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType);
         assertEquals(36, marketRentMonths.size());
-        assertEquals(0, BigDecimal.valueOf(1050.00).compareTo(marketRentMonths.get(3).getMarketRent()));
+        assertEquals(0, BigDecimal.valueOf(1050.00).compareTo(marketRentMonths.get(4).getMarketRent()));
         assertEquals(2, marketRentMonths.get(1).getMonth(), "Response is not sorted");
         assertEquals(0, BigDecimal.valueOf(910.00).compareTo(marketRentMonths.get(7).getActualRent()));
-        assertEquals(0, BigDecimal.valueOf(1102.50).compareTo(marketRentMonths.get(7).getMarketRent()));
+        assertEquals(0, BigDecimal.valueOf(1102.50).compareTo(marketRentMonths.get(8).getMarketRent()));
         assertEquals(0, BigDecimal.valueOf(910.00).compareTo(marketRentMonths.get(11).getActualRent()));
-        assertEquals(0, BigDecimal.valueOf(1146.60).compareTo(marketRentMonths.get(11).getMarketRent()));
-        assertEquals(0, BigDecimal.valueOf(1599.42).compareTo(marketRentMonths.get(15).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1537.90).compareTo(marketRentMonths.get(12).getMarketRent()));
+        assertEquals(0, BigDecimal.valueOf(1599.42).compareTo(marketRentMonths.get(16).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
         assertEquals(0, BigDecimal.valueOf(1537.90).compareTo(marketRentMonths.get(15).getActualRent()));
-        assertEquals(0, BigDecimal.valueOf(1663.39).compareTo(marketRentMonths.get(19).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1663.39).compareTo(marketRentMonths.get(20).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
         assertEquals(0, BigDecimal.valueOf(1599.42).compareTo(marketRentMonths.get(19).getActualRent().setScale(2, RoundingMode.HALF_EVEN)));
-        assertEquals(0, BigDecimal.valueOf(1746.56).compareTo(marketRentMonths.get(23).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1746.56).compareTo(marketRentMonths.get(24).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
         assertEquals(0, BigDecimal.valueOf(1599.42).compareTo(marketRentMonths.get(23).getActualRent().setScale(2, RoundingMode.HALF_EVEN)));
-        assertEquals(0, BigDecimal.valueOf(1833.89).compareTo(marketRentMonths.get(27).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1833.89).compareTo(marketRentMonths.get(28).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
         assertEquals(0, BigDecimal.valueOf(1729.93).compareTo(marketRentMonths.get(27).getActualRent().setScale(2, RoundingMode.HALF_EVEN)));
-        assertEquals(0, BigDecimal.valueOf(1925.58).compareTo(marketRentMonths.get(31).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1925.58).compareTo(marketRentMonths.get(32).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
         assertEquals(0, BigDecimal.valueOf(1781.83).compareTo(marketRentMonths.get(31).getActualRent().setScale(2, RoundingMode.HALF_EVEN)));
-        assertEquals(0, BigDecimal.valueOf(1964.10).compareTo(marketRentMonths.get(35).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1925.58).compareTo(marketRentMonths.get(35).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
         assertEquals(0, BigDecimal.valueOf(1781.83).compareTo(marketRentMonths.get(35).getActualRent().setScale(2, RoundingMode.HALF_EVEN)));
     }
 
@@ -142,11 +142,11 @@ class RentValueServiceTest {
 
         var marketRentMonths1 = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType1);
         assertEquals(4, marketRentMonths1.size());
-        assertEquals(0, BigDecimal.valueOf(1100).compareTo(marketRentMonths1.get(0).getMarketRent()));
+        assertEquals(0, BigDecimal.valueOf(1100).compareTo(marketRentMonths1.get(1).getMarketRent()));
 
         var marketRentMonths2 = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType2);
         assertEquals(3, marketRentMonths2.size());
-        assertEquals(0, BigDecimal.valueOf(2200).compareTo(marketRentMonths2.get(0).getMarketRent()));
+        assertEquals(0, BigDecimal.valueOf(2200).compareTo(marketRentMonths2.get(1).getMarketRent()));
     }
 
     @Test
@@ -176,7 +176,7 @@ class RentValueServiceTest {
         var unitType1MarketYear = marketValueResponse.getUnitTypeMarketRentYears().get(unitType);
         assertEquals(1, unitType1MarketYear.size());
         var year0MarketValue = unitType1MarketYear.get(0).getMarketRent();
-        assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(4400)));
+        assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(4300)));
     }
 
     @Test
@@ -214,12 +214,12 @@ class RentValueServiceTest {
         var unitType1MarketYear = marketValueResponse.getUnitTypeMarketRentYears().get(unitType1);
         assertEquals(1, unitType1MarketYear.size());
         var year0MarketValue = unitType1MarketYear.get(0).getMarketRent();
-        assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(4400)));
+        assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(4300)));
 
         var unitType2MarketYear = marketValueResponse.getUnitTypeMarketRentYears().get(unitType2);
         assertEquals(1, unitType2MarketYear.size());
         year0MarketValue = unitType2MarketYear.get(0).getMarketRent();
-        assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(6600)));
+        assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(6400)));
     }
 
 

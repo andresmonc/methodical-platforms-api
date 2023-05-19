@@ -12,10 +12,9 @@ import static java.math.RoundingMode.HALF_EVEN;
 @Service
 public class MarketRentForecastService {
 
-    public BigDecimal calculateMarketRentForMonth(ForecastMonth forecastMonth, BigDecimal priorMarketRent,
+    public BigDecimal calculateMarketRentForMonth(BigDecimal marketEscalationRate, BigDecimal priorMarketRent,
                                                   BigDecimal forecastedActualRent, BigDecimal excessRateAdjustmentRate) {
-        BigDecimal escalationFactor = BigDecimal.ONE.add(forecastMonth.getMarketEscalationRate());
-        BigDecimal forecastedMarketRent = priorMarketRent.multiply(escalationFactor);
+        BigDecimal forecastedMarketRent = priorMarketRent.multiply(marketEscalationRate);
 
         // avoid division by zero;
         if (forecastedActualRent.compareTo(BigDecimal.ZERO) != 0 && excessRateAdjustmentRate.compareTo(BigDecimal.ZERO) != 0) {

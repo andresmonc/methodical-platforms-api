@@ -113,6 +113,8 @@ public class RentForecastService {
         BigDecimal actualRent = Objects.requireNonNullElse(unitTypeForecast.getStartingActualRent(), BigDecimal.ZERO);
         BigDecimal excessRentAdjustmentRate = Objects.requireNonNullElse(unitTypeForecast.getExcessRentAdjustmentRate(), BigDecimal.ZERO);
         BigDecimal compoundedActualEscalationRate = BigDecimal.ONE;
+        BigDecimal marketEscalationRate = BigDecimal.ONE;
+
         // Sort the escalation months
         List<ForecastMonth> sortedForecastMonths = unitTypeForecast.getForecastMonthData().stream()
                 .sorted(Comparator.comparingInt(ForecastMonth::getYear)
@@ -130,14 +132,18 @@ public class RentForecastService {
                             )
                     );
             BigDecimal currentMonthActualEscalationRate = BigDecimal.ONE;
-            // Only escalate actual if we're in a renewal month, check remainder of i/term
-            if (unitTypeForecast.getContractTerm() != null && (i % unitTypeForecast.getContractTerm()) == 0) {
+
+            // Only escalate actual if it's the month after contract end
+            if (isEscalationMonthForActual(unitTypeForecast, i)) {
                 currentMonthActualEscalationRate = compoundedActualEscalationRate;
             }
 
             // Forecast rents for month in question
             BigDecimal forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(unitTypeForecast.getStartingActualRent(), actualRent, currentMonthActualEscalationRate);
-            BigDecimal forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(forecastMonth, marketRent, forecastedActualRent, excessRentAdjustmentRate);
+            BigDecimal forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(marketEscalationRate, marketRent, forecastedActualRent, excessRentAdjustmentRate);
+
+            // We want to escalate the market rents the following month, last month/last year discarded if it exists
+            marketEscalationRate = BigDecimal.ONE.add(forecastMonth.getMarketEscalationRate());
 
             RentForecastMonth rentMonth = RentForecastMonth.builder()
                     .month(forecastMonth.getMonth())
@@ -186,6 +192,11 @@ public class RentForecastService {
 
         // Convert the map to a list of RentYear objects
         return yearSummaries.values().stream().toList();
+    }
+
+    private boolean isEscalationMonthForActual(UnitTypeForecast unitTypeForecast, int currentMonth) {
+        // this works because our array is 0 indexed, so if we renew every 6 months, index 6 would actually be the 7th month
+        return unitTypeForecast.getContractTerm() != null && (currentMonth % unitTypeForecast.getContractTerm()) == 0;
     }
 
 }
