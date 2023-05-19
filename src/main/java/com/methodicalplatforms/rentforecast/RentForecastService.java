@@ -30,6 +30,8 @@ public class RentForecastService {
     private final ActualRentForecastService actualRentForecastService;
     private final MarketRentForecastService marketRentForecastService;
 
+    private static final int DECIMAL_PLACES = 15;
+
     @Autowired
     public RentForecastService(ActualRentForecastService actualRentForecastService, MarketRentForecastService marketRentForecastService) {
         this.actualRentForecastService = actualRentForecastService;
@@ -140,8 +142,8 @@ public class RentForecastService {
             RentForecastMonth rentMonth = RentForecastMonth.builder()
                     .month(forecastMonth.getMonth())
                     .year(forecastMonth.getYear())
-                    .marketRent(forecastedMarketRent.setScale(10, RoundingMode.HALF_EVEN))
-                    .actualRent(forecastedActualRent.setScale(10, RoundingMode.HALF_EVEN))
+                    .marketRent(forecastedMarketRent.setScale(DECIMAL_PLACES, RoundingMode.HALF_EVEN))
+                    .actualRent(forecastedActualRent.setScale(DECIMAL_PLACES, RoundingMode.HALF_EVEN))
                     .build();
 
             // Update the tracker for current market rents for the unit type
