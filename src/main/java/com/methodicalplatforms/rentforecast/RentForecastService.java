@@ -125,14 +125,7 @@ public class RentForecastService {
             // Get current month
             ForecastMonth forecastMonth = sortedForecastMonths.get(i);
 
-            // Compound actual escalation and determine actual escalation rate for this month
-            compoundedActualEscalationRate = compoundedActualEscalationRate
-                    .multiply(BigDecimal.ONE.add(
-                                    Objects.requireNonNullElse(forecastMonth.getActualEscalationRate(), BigDecimal.ZERO)
-                            )
-                    );
             BigDecimal currentMonthActualEscalationRate = BigDecimal.ONE;
-
             // Only escalate actual if it's the month after contract end
             if (isEscalationMonthForActual(unitTypeForecast, i)) {
                 currentMonthActualEscalationRate = compoundedActualEscalationRate;
@@ -141,6 +134,14 @@ public class RentForecastService {
             // Forecast rents for month in question
             BigDecimal forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(unitTypeForecast.getStartingActualRent(), actualRent, currentMonthActualEscalationRate);
             BigDecimal forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(marketEscalationRate, marketRent, forecastedActualRent, excessRentAdjustmentRate);
+
+
+            // Compound actual escalation and determine actual escalation rate for next month
+            compoundedActualEscalationRate = compoundedActualEscalationRate
+                    .multiply(BigDecimal.ONE.add(
+                                    Objects.requireNonNullElse(forecastMonth.getActualEscalationRate(), BigDecimal.ZERO)
+                            )
+                    );
 
             // We want to escalate the market rents the following month, last month/last year discarded if it exists
             marketEscalationRate = BigDecimal.ONE.add(forecastMonth.getMarketEscalationRate());
