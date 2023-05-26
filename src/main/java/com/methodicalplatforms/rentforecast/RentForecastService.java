@@ -43,26 +43,28 @@ public class RentForecastService {
     public RentResponse forecastRents(RentForecastRequest rentForecastRequest) {
         Map<String, UnitTypeForecastMonthly> rentByMonths = forecastRentsForAllUnitTypes(rentForecastRequest.getUnitTypeForecastList());
 
-        RentResponse.RentResponseBuilder rentResponseBuilder = RentResponse.builder();
-        RentForecastOptions options = rentForecastRequest.getOptions();
-        if (options != null && rentForecastRequest.getOptions().getSummarizeByYear()) {
-            // Summarize by Year
-            Map<String, List<RentForecastYear>> rentByYears = summarizeYearsForAllUnitTypes(rentByMonths);
-            if (options.getSummarizeByUnitType()) {
-                // Summarize by unit type
-                rentByYears = yearlySummaryByUnitType(rentByYears);
-            }
-            rentResponseBuilder.unitTypeMarketRentYears(rentByYears);
-        } else {
-            // Monthly summary
-            if (options != null && options.getSummarizeByUnitType()) {
-                // Summarize by unit type
-                rentByMonths = monthlySummaryByUnitType(rentByMonths);
-            }
-            rentResponseBuilder.unitTypeMarketRentMonths(rentByMonths);
-        }
+//        RentResponse.RentResponseBuilder rentResponseBuilder = RentResponse.builder();
+//        RentForecastOptions options = rentForecastRequest.getOptions();
+//        if (options != null && rentForecastRequest.getOptions().getSummarizeByYear()) {
+//            // Summarize by Year
+//            Map<String, List<RentForecastYear>> rentByYears = summarizeYearsForAllUnitTypes(rentByMonths);
+//            if (options.getSummarizeByUnitType()) {
+//                // Summarize by unit type
+//                rentByYears = yearlySummaryByUnitType(rentByYears);
+//            }
+//            rentResponseBuilder.unitTypeMarketRentYears(rentByYears);
+//        } else {
+//            // Monthly summary
+//            if (options != null && options.getSummarizeByUnitType()) {
+//                // Summarize by unit type
+//                rentByMonths = monthlySummaryByUnitType(rentByMonths);
+//            }
+//            rentResponseBuilder.unitTypeMarketRentMonths(rentByMonths);
+//        }
 
-        return rentResponseBuilder.build();
+//        return rentResponseBuilder.build();
+
+        return RentResponse.builder().unitTypeMarketRentMonths(rentByMonths).build();
     }
 
     private Map<String, List<RentForecastMonth>> monthlySummaryByUnitType(Map<String, List<RentForecastMonth>> rentMonthsByUnitType) {
