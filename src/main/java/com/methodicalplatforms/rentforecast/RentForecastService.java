@@ -5,10 +5,12 @@ import com.methodicalplatforms.rentforecast.market.MarketRentForecastService;
 import com.methodicalplatforms.rentforecast.request.ForecastMonth;
 import com.methodicalplatforms.rentforecast.request.RentForecastOptions;
 import com.methodicalplatforms.rentforecast.request.RentForecastRequest;
+import com.methodicalplatforms.rentforecast.request.UnitDetails;
 import com.methodicalplatforms.rentforecast.request.UnitTypeForecast;
 import com.methodicalplatforms.rentforecast.response.RentForecastMonth;
 import com.methodicalplatforms.rentforecast.response.RentForecastYear;
 import com.methodicalplatforms.rentforecast.response.RentResponse;
+import com.methodicalplatforms.rentforecast.response.UnitTypeForecastMonthly;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class RentForecastService {
@@ -39,7 +41,7 @@ public class RentForecastService {
     }
 
     public RentResponse forecastRents(RentForecastRequest rentForecastRequest) {
-        Map<String, List<RentForecastMonth>> rentByMonths = forecastRentsForAllUnitTypes(rentForecastRequest.getUnitTypeForecastList());
+        Map<String, UnitTypeForecastMonthly> rentByMonths = forecastRentsForAllUnitTypes(rentForecastRequest.getUnitTypeForecastList());
 
         RentResponse.RentResponseBuilder rentResponseBuilder = RentResponse.builder();
         RentForecastOptions options = rentForecastRequest.getOptions();
@@ -94,45 +96,98 @@ public class RentForecastService {
     }
 
 
-    private Map<String, List<RentForecastMonth>> forecastRentsForAllUnitTypes(List<UnitTypeForecast> unitTypeForecastList) {
-        // Use a stream to iterate through the forecast data for each unit type and create a map with unit type as key and monthly market rents as value
-        return unitTypeForecastList.stream()
-                // The first argument to Collectors.toMap specifies the key to be used in the map
-                .collect(Collectors.toMap(
-                        UnitTypeForecast::getUnitType, // key is unit type
-                        this::forecastMonthlyRentsByIndividualUnitType, // value is monthly market rents
-                        // This merge function resolves any key collisions by keeping the last value encountered (i.e. using the new value instead of the old value)
-                        (a, b) -> b, HashMap::new));
+//    private Map<String, List<RentForecastMonth>> forecastRentsForAllUnitTypes(List<UnitTypeForecast> unitTypeForecastList) {
+//        // Use a stream to iterate through the forecast data for each unit type and create a map with unit type as key and monthly market rents as value
+//        return unitTypeForecastList.stream()
+//                // The first argument to Collectors.toMap specifies the key to be used in the map
+//                .collect(Collectors.toMap(UnitTypeForecast::getUnitType, // key is unit type
+//                        this::forecastMonthlyRentsForAllUnits, // value is monthly market rents
+//                        // This merge function resolves any key collisions by keeping the last value encountered (i.e. using the new value instead of the old value)
+//                        (a, b) -> b, HashMap::new));
+//    }
+
+
+    private Map<String, UnitTypeForecastMonthly> forecastRentsForAllUnitTypes(List<UnitTypeForecast> unitTypeForecastList) {
+        Map<String, UnitTypeForecastMonthly> forecastDataByUnitTypeMonthly = new HashMap<>();
+
+        List<CompletableFuture<Void>> futures = unitTypeForecastList.stream().map(unitTypeForecast -> CompletableFuture.supplyAsync(() -> {
+            Map<String, List<RentForecastMonth>> unitForecasts = forecastMonthlyRentsForAllUnits(unitTypeForecast);
+            List<RentForecastMonth> unitTypeSummary = summarizeUnitType(unitForecasts);
+
+            UnitTypeForecastMonthly unitTypeForecastMonthly = UnitTypeForecastMonthly.builder().unitTypeForecast(unitTypeSummary).unitForecasts(unitForecasts).build();
+            return Map.entry(unitTypeForecast.getUnitType(), unitTypeForecastMonthly);
+        })).map(future -> future.thenAcceptAsync(entry -> forecastDataByUnitTypeMonthly.put(entry.getKey(), entry.getValue()))).toList();
+
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        allFutures.join();
+
+        return forecastDataByUnitTypeMonthly;
     }
 
-    private List<RentForecastMonth> forecastMonthlyRentsByIndividualUnitType(UnitTypeForecast unitTypeForecast) {
+    public List<RentForecastMonth> summarizeUnitType(Map<String, List<RentForecastMonth>> unitForecastData) {
+        List<RentForecastMonth> unitTypeSummary = new ArrayList<>();
+
+        unitForecastData.forEach((unitName, rentForecastMonths) -> {
+            for (int i = 0; i < rentForecastMonths.size(); i++) {
+                RentForecastMonth rentForecastMonth = rentForecastMonths.get(i);
+                if (unitTypeSummary.size() <= i) {
+                    unitTypeSummary.add(rentForecastMonth);
+                } else {
+                    RentForecastMonth unitTypeRentforecastMonth = unitTypeSummary.get(i);
+                    unitTypeRentforecastMonth.setActualRent(unitTypeRentforecastMonth.getActualRent().add(rentForecastMonth.getActualRent()));
+                    unitTypeRentforecastMonth.setMarketRent(unitTypeRentforecastMonth.getMarketRent().add(rentForecastMonth.getMarketRent()));
+                }
+            }
+
+        });
+        return unitTypeSummary;
+    }
+
+    private Map<String, List<RentForecastMonth>> forecastMonthlyRentsForAllUnits(UnitTypeForecast unitTypeForecast) {
+        Map<String, List<RentForecastMonth>> unitForecasts = new HashMap<>();
+
+        // Sort the escalation months
+        List<ForecastMonth> sortedForecastMonths = unitTypeForecast.getForecastMonthData().stream().sorted(Comparator.comparingInt(ForecastMonth::getYear).thenComparingInt(ForecastMonth::getMonth)).toList();
+
+        // Process Units concurrently
+        List<CompletableFuture<Void>> futures = unitTypeForecast.getUnitDetails().entrySet().stream().map(entry -> CompletableFuture.supplyAsync(() -> {
+            UnitDetails unitDetails = entry.getValue();
+            List<RentForecastMonth> forecastedRentsByMonth = forecastRentsByMonthForUnit(sortedForecastMonths, unitTypeForecast.getExcessRentAdjustmentRate(), unitDetails);
+            return Map.entry(entry.getKey(), forecastedRentsByMonth);
+        })).map(future -> future.thenAcceptAsync(entry -> unitForecasts.put(entry.getKey(), entry.getValue()))).toList();
+
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        allFutures.join();
+
+        return unitForecasts;
+    }
+
+
+    //Objects.requireNonNullElse(excessRentAdjustmentRate, BigDecimal.ZERO);
+
+    private List<RentForecastMonth> forecastRentsByMonthForUnit(List<ForecastMonth> forecastMonths, BigDecimal
+            excessRentAdjustmentRate, UnitDetails unitDetails) {
         List<RentForecastMonth> forecastedRentsByMonth = new ArrayList<>();
 
         // Track the rent values for the unit type
-        BigDecimal marketRent = Objects.requireNonNullElse(unitTypeForecast.getStartingMarketRent(), BigDecimal.ZERO);
-        BigDecimal actualRent = Objects.requireNonNullElse(unitTypeForecast.getStartingActualRent(), BigDecimal.ZERO);
-        BigDecimal excessRentAdjustmentRate = Objects.requireNonNullElse(unitTypeForecast.getExcessRentAdjustmentRate(), BigDecimal.ZERO);
+        BigDecimal marketRent = Objects.requireNonNullElse(unitDetails.getStartingMarketRent(), BigDecimal.ZERO);
+        BigDecimal actualRent = Objects.requireNonNullElse(unitDetails.getStartingActualRent(), BigDecimal.ZERO);
         BigDecimal compoundedActualEscalationRate = BigDecimal.ONE;
         BigDecimal marketEscalationRate = BigDecimal.ONE;
 
-        // Sort the escalation months
-        List<ForecastMonth> sortedForecastMonths = unitTypeForecast.getForecastMonthData().stream()
-                .sorted(Comparator.comparingInt(ForecastMonth::getYear)
-                        .thenComparingInt(ForecastMonth::getMonth))
-                .toList();
 
-        for (int i = 0; i < sortedForecastMonths.size(); i++) {
+        for (int i = 0; i < forecastMonths.size(); i++) {
             // Get current month
-            ForecastMonth forecastMonth = sortedForecastMonths.get(i);
+            ForecastMonth forecastMonth = forecastMonths.get(i);
 
             BigDecimal currentMonthActualEscalationRate = BigDecimal.ONE;
             // Only escalate actual if it's the month after contract end
-            if (isEscalationMonthForActual(unitTypeForecast, i)) {
+            if (isEscalationMonthForActual(unitDetails, i)) {
                 currentMonthActualEscalationRate = compoundedActualEscalationRate;
             }
 
             // Forecast rents for month in question
-            BigDecimal forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(unitTypeForecast.getStartingActualRent(), actualRent, currentMonthActualEscalationRate);
+            BigDecimal forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(unitDetails.getStartingActualRent(), actualRent, currentMonthActualEscalationRate);
             BigDecimal forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(marketEscalationRate, marketRent, forecastedActualRent, excessRentAdjustmentRate);
 
 
@@ -158,7 +213,6 @@ public class RentForecastService {
             marketRent = forecastedMarketRent;
             actualRent = forecastedActualRent;
         }
-
         return forecastedRentsByMonth;
     }
 
@@ -194,9 +248,9 @@ public class RentForecastService {
         return yearSummaries.values().stream().toList();
     }
 
-    private boolean isEscalationMonthForActual(UnitTypeForecast unitTypeForecast, int currentMonth) {
+    private boolean isEscalationMonthForActual(UnitDetails unitDetails, int currentMonth) {
         // this works because our array is 0 indexed, so if we renew every 6 months, index 6 would actually be the 7th month
-        return unitTypeForecast.getContractTerm() != null && (currentMonth % unitTypeForecast.getContractTerm()) == 0;
+        return unitDetails.getContractTerm() != null && (currentMonth % unitDetails.getContractTerm()) == 0;
     }
 
 }

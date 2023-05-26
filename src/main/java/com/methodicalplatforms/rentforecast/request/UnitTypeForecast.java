@@ -5,14 +5,13 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
 public class UnitTypeForecast {
         private String unitType;
         private List<ForecastMonth> forecastMonthData;
-        private BigDecimal startingMarketRent;
-        private BigDecimal startingActualRent;
         public BigDecimal excessRentAdjustmentRate;
-        public Integer contractTerm;
+        public Map<String, UnitDetails> unitDetails;
 }
