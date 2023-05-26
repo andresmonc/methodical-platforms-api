@@ -11,7 +11,6 @@ import com.methodicalplatforms.rentforecast.response.RentForecastMonth;
 import com.methodicalplatforms.rentforecast.response.RentForecastYear;
 import com.methodicalplatforms.rentforecast.response.RentResponse;
 import com.methodicalplatforms.rentforecast.response.UnitTypeForecastMonthly;
-import com.methodicalplatforms.rentforecast.response.UnitTypeForecastYearly;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
