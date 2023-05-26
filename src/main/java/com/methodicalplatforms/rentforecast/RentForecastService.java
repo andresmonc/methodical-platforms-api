@@ -40,6 +40,12 @@ public class RentForecastService {
         this.marketRentForecastService = marketRentForecastService;
     }
 
+    /**
+     * forecasts rents
+     *
+     * @param rentForecastRequest - details on what/how to forecast
+     * @return - forecast response
+     */
     public RentResponse forecastRents(RentForecastRequest rentForecastRequest) {
         Map<String, UnitTypeForecastMonthly> rentByMonths = forecastRentsForAllUnitTypes(rentForecastRequest.getUnitTypeForecastList());
 
@@ -57,17 +63,20 @@ public class RentForecastService {
             // Monthly summary
             if (options != null && options.getSummarizeByUnitType()) {
                 // Summarize by unit type
-                monthlySummaryByUnitType(rentByMonths);
+                summarizeAllUnitTypes(rentByMonths);
             }
             rentResponseBuilder.unitTypeMarketRentMonths(rentByMonths);
         }
 
         return rentResponseBuilder.build();
-
-//        return RentResponse.builder().unitTypeMarketRentMonths(rentByMonths).build();
     }
 
-    private void monthlySummaryByUnitType(Map<String, UnitTypeForecastMonthly> rentMonthsByUnitType) {
+    /**
+     * Summarizes the data for all unit types on a monthly basis
+     *
+     * @param rentMonthsByUnitType - map of forecasts by unit type
+     */
+    private void summarizeAllUnitTypes(Map<String, UnitTypeForecastMonthly> rentMonthsByUnitType) {
         UnitTypeForecastMonthly allUnitsForecastSummary = UnitTypeForecastMonthly.builder()
                 .unitTypeForecast(new ArrayList<>()).build();
 
@@ -108,6 +117,12 @@ public class RentForecastService {
         return Map.of(ALL_UNITS, new ArrayList<>(totalsForRentYears.values()));
     }
 
+    /**
+     * Forecast rents for each unit type
+     *
+     * @param unitTypeForecastList - the list of unit types and their corresponding forecast data
+     * @return - a map of forecasts by unit type
+     */
     private Map<String, UnitTypeForecastMonthly> forecastRentsForAllUnitTypes(List<UnitTypeForecast> unitTypeForecastList) {
         Map<String, UnitTypeForecastMonthly> forecastDataByUnitTypeMonthly = new HashMap<>();
 
@@ -164,6 +179,14 @@ public class RentForecastService {
     }
 
 
+    /**
+     * forecast the rents for all months/years for a specific unit
+     *
+     * @param forecastMonths           - contains the data for each month in question
+     * @param excessRentAdjustmentRate - the rate in which to modify loss to lease
+     * @param unitDetails              - the details for a particular unit
+     * @return - forecasted data for a unit
+     */
     private List<RentForecastMonth> forecastRentsByMonthForUnit(List<ForecastMonth> forecastMonths, BigDecimal
             excessRentAdjustmentRate, UnitDetails unitDetails) {
         List<RentForecastMonth> forecastedRentsByMonth = new ArrayList<>();
@@ -247,6 +270,13 @@ public class RentForecastService {
         return yearSummaries.values().stream().toList();
     }
 
+    /**
+     * Should we escalate this month in question?
+     *
+     * @param unitDetails  - details for a unit
+     * @param currentMonth - current month index
+     * @return - true or false, whether or not we should escalate
+     */
     private boolean isEscalationMonthForActual(UnitDetails unitDetails, int currentMonth) {
         // this works because our array is 0 indexed, so if we renew every 6 months, index 6 would actually be the 7th month
         return unitDetails.getContractTerm() != null && (currentMonth % unitDetails.getContractTerm()) == 0;
