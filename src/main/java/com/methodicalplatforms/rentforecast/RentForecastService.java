@@ -11,6 +11,7 @@ import com.methodicalplatforms.rentforecast.response.RentForecastMonth;
 import com.methodicalplatforms.rentforecast.response.RentForecastYear;
 import com.methodicalplatforms.rentforecast.response.RentResponse;
 import com.methodicalplatforms.rentforecast.response.UnitTypeForecastMonthly;
+import com.methodicalplatforms.rentforecast.response.UnitTypeForecastYearly;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,12 +54,12 @@ public class RentForecastService {
         RentForecastOptions options = rentForecastRequest.getOptions();
         if (options != null && rentForecastRequest.getOptions().getSummarizeByYear()) {
             // Summarize by Year
-//            Map<String, UnitTypeForecastYearly> rentByYears = summarizeYearsForAllUnitTypes(rentByMonths);
-//            if (options.getSummarizeByUnitType()) {
-//                // Summarize by unit type
-//                rentByYears = yearlySummaryByUnitType(rentByYears);
-//            }
-//            rentResponseBuilder.unitTypeMarketRentYears(rentByYears);
+            Map<String, UnitTypeForecastYearly> rentByYears = summarizeYearsForAllUnitTypes(rentByMonths);
+            if (options.getSummarizeByUnitType()) {
+                // Summarize by unit type
+                yearlySummaryByUnitType(rentByYears);
+            }
+            rentResponseBuilder.unitTypeMarketRentYears(rentByYears);
         } else {
             // Monthly summary
             if (options != null && options.getSummarizeByUnitType()) {
@@ -102,19 +103,29 @@ public class RentForecastService {
         rentMonthsByUnitType.put(ALL_UNITS, allUnitsForecastSummary);
     }
 
-    private Map<String, List<RentForecastYear>> yearlySummaryByUnitType(Map<String, List<RentForecastYear>> rentYearsByUnitType) {
-        Map<Integer, RentForecastYear> totalsForRentYears = new HashMap<>();
-        rentYearsByUnitType.values().stream()
-                .flatMap(List::stream)
-                .forEach(unitRentYear -> totalsForRentYears.merge(
-                        unitRentYear.getYear(),
-                        unitRentYear,
-                        (oldRentYear, newRentYear) -> {
-                            oldRentYear.setMarketRent(oldRentYear.getMarketRent().add(newRentYear.getMarketRent()));
-                            return oldRentYear;
-                        }));
+    /**
+     * Summarize all unit types at a yearly level
+     *
+     * @param rentYearsByUnitType - the yearly summaries for individual units
+     */
+    private void yearlySummaryByUnitType(Map<String, UnitTypeForecastYearly> rentYearsByUnitType) {
+        UnitTypeForecastYearly allUnitTypeForecastYearly = new UnitTypeForecastYearly();
+        List<RentForecastYear> unitTypeSummary = new ArrayList<>();
 
-        return Map.of(ALL_UNITS, new ArrayList<>(totalsForRentYears.values()));
+        rentYearsByUnitType.forEach((unitName, rentForecastMonths) -> {
+            for (int i = 0; i < rentForecastMonths.getUnitTypeForecast().size(); i++) {
+                RentForecastYear rentForecastMonth = rentForecastMonths.getUnitTypeForecast().get(i);
+                if (unitTypeSummary.size() <= i) {
+                    unitTypeSummary.add(rentForecastMonth);
+                } else {
+                    RentForecastYear unitTypeForecastYear = unitTypeSummary.get(i);
+                    unitTypeForecastYear.setActualRent(unitTypeForecastYear.getActualRent().add(rentForecastMonth.getActualRent()));
+                    unitTypeForecastYear.setMarketRent(unitTypeForecastYear.getMarketRent().add(rentForecastMonth.getMarketRent()));
+                }
+            }
+        });
+        allUnitTypeForecastYearly.setUnitTypeForecast(unitTypeSummary);
+        rentYearsByUnitType.put(ALL_UNITS, allUnitTypeForecastYearly);
     }
 
     /**
@@ -239,15 +250,27 @@ public class RentForecastService {
     }
 
 
-    private Map<String, List<RentForecastYear>> summarizeYearsForAllUnitTypes(Map<String, List<RentForecastMonth>> forecastedRentMonthsByUnitType) {
-        Map<String, List<RentForecastYear>> yearSummaryByUnitType = new HashMap<>();
+    private Map<String, UnitTypeForecastYearly> summarizeYearsForAllUnitTypes(Map<String, UnitTypeForecastMonthly> forecastedRentMonthsByUnitType) {
+        Map<String, UnitTypeForecastYearly> unitTypeForecastYearlyMap = new HashMap<>();
+
         // Summarize the year for each unit type
-        forecastedRentMonthsByUnitType.forEach((unitType, forecastedRentMonths) -> {
-            List<RentForecastYear> rentYearSummaryForUnitType = summarizeYearsForAUnitType(forecastedRentMonths);
-            yearSummaryByUnitType.put(unitType, rentYearSummaryForUnitType);
+        forecastedRentMonthsByUnitType.forEach((unitType, unitTypeForecastMonthly) -> {
+            UnitTypeForecastYearly unitTypeForecastYearly = new UnitTypeForecastYearly();
+            Map<String, List<RentForecastYear>> unitForecastsYearly = new HashMap<>();
+            // Summarize the years for each unit
+            unitTypeForecastMonthly.getUnitForecasts().forEach((unitId, rentForecastMonths) -> {
+                List<RentForecastYear> rentYearSummaryForUnitType = summarizeYearsForAUnitType(rentForecastMonths);
+                unitForecastsYearly.put(unitId, rentYearSummaryForUnitType);
+            });
+            List<RentForecastYear> rentYearSummaryForUnitType = summarizeYearsForAUnitType(unitTypeForecastMonthly.getUnitTypeForecast());
+
+            // Save results
+            unitTypeForecastYearly.setUnitMarketRentYears(unitForecastsYearly);
+            unitTypeForecastYearly.setUnitTypeForecast(rentYearSummaryForUnitType);
+            unitTypeForecastYearlyMap.put(unitType, unitTypeForecastYearly);
         });
 
-        return yearSummaryByUnitType;
+        return unitTypeForecastYearlyMap;
     }
 
     private List<RentForecastYear> summarizeYearsForAUnitType(List<RentForecastMonth> rentMonths) {
