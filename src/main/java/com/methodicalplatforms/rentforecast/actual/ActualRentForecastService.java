@@ -13,7 +13,6 @@ public class ActualRentForecastService {
         if (actualEscalationRate.compareTo(BigDecimal.ONE) == 0) {
             return currentActualRent;
         }
-
         return Objects.requireNonNullElse(startingActualRent, BigDecimal.ZERO).multiply(actualEscalationRate);
     }
 }

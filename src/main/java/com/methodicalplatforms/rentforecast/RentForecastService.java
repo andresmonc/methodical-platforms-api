@@ -151,6 +151,12 @@ public class RentForecastService {
         return forecastDataByUnitTypeMonthly;
     }
 
+    /**
+     * Sum up individual units for a given Unit Type to provide a summary
+     *
+     * @param unitForecastData
+     * @return
+     */
     public List<RentForecastMonth> summarizeUnitType(Map<String, List<RentForecastMonth>> unitForecastData) {
         List<RentForecastMonth> unitTypeSummary = new ArrayList<>();
 
@@ -250,6 +256,12 @@ public class RentForecastService {
     }
 
 
+    /**
+     * Provide a summary for each unit type at a yearly level
+     *
+     * @param forecastedRentMonthsByUnitType
+     * @return
+     */
     private Map<String, UnitTypeForecastYearly> summarizeYearsForAllUnitTypes(Map<String, UnitTypeForecastMonthly> forecastedRentMonthsByUnitType) {
         Map<String, UnitTypeForecastYearly> unitTypeForecastYearlyMap = new HashMap<>();
 
@@ -273,6 +285,12 @@ public class RentForecastService {
         return unitTypeForecastYearlyMap;
     }
 
+    /**
+     * yearly summary for an individual unit type
+     *
+     * @param rentMonths
+     * @return
+     */
     private List<RentForecastYear> summarizeYearsForAUnitType(List<RentForecastMonth> rentMonths) {
         Map<Integer, RentForecastYear> yearSummaries = new LinkedHashMap<>();
         rentMonths.forEach(rentForecastMonth -> {
@@ -298,7 +316,7 @@ public class RentForecastService {
      *
      * @param unitDetails  - details for a unit
      * @param currentMonth - current month index
-     * @return - true or false, whether or not we should escalate
+     * @return - true or false, whether we should escalate
      */
     private boolean isEscalationMonthForActual(UnitDetails unitDetails, int currentMonth) {
         // this works because our array is 0 indexed, so if we renew every 6 months, index 6 would actually be the 7th month

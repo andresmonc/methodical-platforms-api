@@ -12,4 +12,7 @@ import java.util.Map;
 public class RentResponse {
     private Map<String, UnitTypeForecastMonthly> unitTypeMarketRentMonths;
     private Map<String, UnitTypeForecastYearly> unitTypeMarketRentYears;
+
+
+    private Map<String, UnitTypeForecastYearly> unitTypeUnitStatusView;
 }
