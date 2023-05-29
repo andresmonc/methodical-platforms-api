@@ -11,4 +11,5 @@ public class UnitDetails {
     private BigDecimal startingMarketRent;
     private BigDecimal startingActualRent;
     private Integer contractTerm;
+    private String unitStatus;
 }
