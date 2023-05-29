@@ -22,6 +22,9 @@ class RentForecastServiceTest {
 
     public RentForecastService rentForecastService;
     ActualRentForecastService actualRentForecastService = new ActualRentForecastService();
+    private static final String UNIT_TYPE_1BR_1BATH = "1 BR 1 BATH";
+    private static final String UNIT_101 = "101";
+    private static final String UNIT_102 = "102";
 
     @BeforeEach
     public void setup() {
@@ -30,12 +33,11 @@ class RentForecastServiceTest {
 
     @Test
     void forecastRentsMonthlySingleUnitType() {
-        var unitType = "1 BR 1 BATH";
         var request = createMarketRentRequest(
                 false,
                 UnitTypeForecast.builder()
-                        .unitType(unitType)
-                        .unitDetails(Map.of("", UnitDetails.builder()
+                        .unitType(UNIT_TYPE_1BR_1BATH)
+                        .unitDetails(Map.of(UNIT_101, UnitDetails.builder()
                                 .contractTerm(6).startingMarketRent(BigDecimal.valueOf(1000))
                                 .startingActualRent(BigDecimal.valueOf(700)).build())
                         )
@@ -88,7 +90,7 @@ class RentForecastServiceTest {
         assertNotNull(marketValueResponse);
         assertEquals(1, marketValueResponse.getUnitTypeMarketRentMonths().size());
 
-        var marketRentMonths = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType);
+        var marketRentMonths = marketValueResponse.getUnitTypeMarketRentMonths().get(UNIT_TYPE_1BR_1BATH).getUnitForecasts().get(UNIT_101);
         assertEquals(36, marketRentMonths.size());
         assertEquals(0, BigDecimal.valueOf(1050.00).compareTo(marketRentMonths.get(4).getMarketRent()));
         assertEquals(2, marketRentMonths.get(1).getMonth(), "Response is not sorted");
@@ -112,14 +114,13 @@ class RentForecastServiceTest {
 
     @Test
     void calculateMarketRentMonthlyMultipleUnitType() {
-        var unitType1 = "1 BR 1 BATH";
         var unitType2 = "2 BR 2 BATH";
         var request = createMarketRentRequest(
                 false,
                 // First Unit
                 UnitTypeForecast.builder()
-                        .unitType(unitType1)
-                        .startingMarketRent(BigDecimal.valueOf(1000))
+                        .unitType(UNIT_TYPE_1BR_1BATH)
+                        .unitDetails(Map.of(UNIT_101, UnitDetails.builder().startingMarketRent(BigDecimal.valueOf(1000)).build()))
                         .forecastMonthData(List.of(
                                 createForecastMonth(0, 0, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
                                 createForecastMonth(0, 1, BigDecimal.ZERO, BigDecimal.valueOf(.10)),
@@ -129,7 +130,7 @@ class RentForecastServiceTest {
                 // Second Unit
                 UnitTypeForecast.builder()
                         .unitType(unitType2)
-                        .startingMarketRent(BigDecimal.valueOf(2000))
+                        .unitDetails(Map.of("102", UnitDetails.builder().startingMarketRent(BigDecimal.valueOf(2000)).build()))
                         .forecastMonthData(List.of(
                                 createForecastMonth(0, 0, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
                                 createForecastMonth(0, 1, BigDecimal.ZERO, BigDecimal.valueOf(.10)),
@@ -143,11 +144,11 @@ class RentForecastServiceTest {
         assertNotNull(marketValueResponse);
         assertEquals(2, marketValueResponse.getUnitTypeMarketRentMonths().size());
 
-        var marketRentMonths1 = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType1);
+        var marketRentMonths1 = marketValueResponse.getUnitTypeMarketRentMonths().get(UNIT_TYPE_1BR_1BATH).getUnitForecasts().get(UNIT_101);
         assertEquals(4, marketRentMonths1.size());
         assertEquals(0, BigDecimal.valueOf(1100).compareTo(marketRentMonths1.get(1).getMarketRent()));
 
-        var marketRentMonths2 = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType2);
+        var marketRentMonths2 = marketValueResponse.getUnitTypeMarketRentMonths().get(unitType2).getUnitForecasts().get("102");
         assertEquals(3, marketRentMonths2.size());
         assertEquals(0, BigDecimal.valueOf(2200).compareTo(marketRentMonths2.get(1).getMarketRent()));
     }
@@ -159,7 +160,7 @@ class RentForecastServiceTest {
                 true,
                 UnitTypeForecast.builder()
                         .unitType(unitType)
-                        .unitDetails(Map.of("", UnitDetails.builder().startingMarketRent(BigDecimal.valueOf(1000)).build()))
+                        .unitDetails(Map.of(UNIT_101, UnitDetails.builder().startingMarketRent(BigDecimal.valueOf(1000)).build()))
                         .forecastMonthData(
                                 List.of(
                                         createForecastMonth(0, 0, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
@@ -176,7 +177,7 @@ class RentForecastServiceTest {
         assertNotNull(marketValueResponse);
         assertEquals(1, marketValueResponse.getUnitTypeMarketRentYears().size());
 
-        var unitType1MarketYear = marketValueResponse.getUnitTypeMarketRentYears().get(unitType);
+        var unitType1MarketYear = marketValueResponse.getUnitTypeMarketRentYears().get(unitType).getUnitMarketRentYears().get(UNIT_101);
         assertEquals(1, unitType1MarketYear.size());
         var year0MarketValue = unitType1MarketYear.get(0).getMarketRent();
         assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(4300)));
@@ -200,7 +201,7 @@ class RentForecastServiceTest {
                         )).build(),
                 UnitTypeForecast.builder()
                         .unitType(unitType2)
-                        .unitDetails(Map.of("102", UnitDetails.builder().startingMarketRent(BigDecimal.valueOf(2000)).build()))
+                        .unitDetails(Map.of(UNIT_102, UnitDetails.builder().startingMarketRent(BigDecimal.valueOf(2000)).build()))
                         .forecastMonthData(List.of(
                                 // Second Unit
                                 createForecastMonth(0, 0, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
@@ -214,12 +215,12 @@ class RentForecastServiceTest {
         assertNotNull(marketValueResponse);
         assertEquals(2, marketValueResponse.getUnitTypeMarketRentYears().size());
 
-        var unitType1MarketYear = marketValueResponse.getUnitTypeMarketRentYears().get(unitType1);
+        var unitType1MarketYear = marketValueResponse.getUnitTypeMarketRentYears().get(unitType1).getUnitMarketRentYears().get(UNIT_101);
         assertEquals(1, unitType1MarketYear.size());
         var year0MarketValue = unitType1MarketYear.get(0).getMarketRent();
         assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(4300)));
 
-        var unitType2MarketYear = marketValueResponse.getUnitTypeMarketRentYears().get(unitType2);
+        var unitType2MarketYear = marketValueResponse.getUnitTypeMarketRentYears().get(unitType2).getUnitMarketRentYears().get(UNIT_102);
         assertEquals(1, unitType2MarketYear.size());
         year0MarketValue = unitType2MarketYear.get(0).getMarketRent();
         assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(6400)));
