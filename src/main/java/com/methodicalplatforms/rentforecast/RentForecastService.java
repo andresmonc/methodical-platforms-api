@@ -32,7 +32,6 @@ public class RentForecastService {
     private static final String ALL_UNITS = "ALL UNITS";
     private final ActualRentForecastService actualRentForecastService;
     private final MarketRentForecastService marketRentForecastService;
-
     private static final int DECIMAL_PLACES = 15;
 
     @Autowired
