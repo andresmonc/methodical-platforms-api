@@ -316,7 +316,13 @@ public class RentForecastService {
         return unitTypeForecastYearlyMap;
     }
 
-    private List<RentForecastYear> sumTwoForecastYears(List<RentForecastYear> forecastYearsToAddTo, List<RentForecastYear> forecastYearsToAddFrom) {
+    /**
+     * Sum 2 yearly forecast summaries
+     *
+     * @param forecastYearsToAddTo   - the list of years to add to
+     * @param forecastYearsToAddFrom - the list of years to add from
+     */
+    private void sumTwoForecastYears(List<RentForecastYear> forecastYearsToAddTo, List<RentForecastYear> forecastYearsToAddFrom) {
         for (int i = 0; i < forecastYearsToAddFrom.size(); i++) {
             RentForecastYear forecastYearFrom = forecastYearsToAddFrom.get(i);
             if (forecastYearsToAddTo.size() <= i) {
@@ -327,7 +333,6 @@ public class RentForecastService {
             forecastYearTo.setActualRent(forecastYearTo.getActualRent().add(forecastYearFrom.getActualRent()));
             forecastYearFrom.setMarketRent(forecastYearTo.getMarketRent().add(forecastYearFrom.getMarketRent()));
         }
-        return forecastYearsToAddTo;
     }
 
     /**
