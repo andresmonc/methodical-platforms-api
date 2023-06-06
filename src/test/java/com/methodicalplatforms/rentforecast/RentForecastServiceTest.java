@@ -263,7 +263,6 @@ class RentForecastServiceTest {
         var year0Ready = readySummary.get(0);
         assertEquals(0, year0Ready.getMarketRent().compareTo(BigDecimal.valueOf(4300)));
         assertEquals(0, year0Ready.getActualRent().compareTo(BigDecimal.valueOf(4000)));
-
         var year0NotReady = notReadySummary.get(0);
         assertEquals(0, year0NotReady.getMarketRent().compareTo(BigDecimal.valueOf(17200)));
         assertEquals(0, year0NotReady.getActualRent().compareTo(BigDecimal.valueOf(8000)));
