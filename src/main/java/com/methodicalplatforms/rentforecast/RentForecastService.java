@@ -59,7 +59,7 @@ public class RentForecastService {
                 yearlySummaryByUnitType(rentByYears);
             }
             rentResponseBuilder.unitTypeUnitStatusView(summarizeByUnitStatus(rentByYears, rentForecastRequest.getUnitTypeForecastList()));
-            rentResponseBuilder.unitTypeMarketRentYears(rentByYears);
+            rentResponseBuilder.unitTypeForecastRentYears(rentByYears);
         } else {
             // Monthly summary
             if (options != null && options.getSummarizeByUnitType()) {
@@ -164,7 +164,7 @@ public class RentForecastService {
             for (int i = 0; i < rentForecastMonths.size(); i++) {
                 RentForecastMonth rentForecastMonth = rentForecastMonths.get(i);
                 if (unitTypeSummary.size() <= i) {
-                    unitTypeSummary.add(rentForecastMonth);
+                    unitTypeSummary.add(RentForecastMonth.builder().marketRent(BigDecimal.ZERO).actualRent(BigDecimal.ZERO).month(rentForecastMonth.getMonth()).year(rentForecastMonth.getYear()).build());
                 } else {
                     RentForecastMonth unitTypeRentforecastMonth = unitTypeSummary.get(i);
                     unitTypeRentforecastMonth.setActualRent(unitTypeRentforecastMonth.getActualRent().add(rentForecastMonth.getActualRent()));
@@ -288,7 +288,7 @@ public class RentForecastService {
             List<RentForecastYear> rentYearSummaryForUnitType = summarizeYearsForAUnitType(unitTypeForecastMonthly.getUnitTypeForecast());
 
             // Save results
-            unitTypeForecastYearly.setUnitMarketRentYears(unitForecastsYearly);
+            unitTypeForecastYearly.setRentForecastYearly(unitForecastsYearly);
             unitTypeForecastYearly.setUnitTypeForecast(rentYearSummaryForUnitType);
             unitTypeForecastYearlyMap.put(unitType, unitTypeForecastYearly);
         });
@@ -307,9 +307,9 @@ public class RentForecastService {
                 if (!unitStatusForecasts.containsKey(unitStatus)) {
                     unitStatusForecasts.put(unitStatus, new ArrayList<>());
                 }
-                List<RentForecastYear> rentForecastYearsForUnitId = yearlySummaries.get(unitType).getUnitMarketRentYears().get(unitId);
+                List<RentForecastYear> rentForecastYearsForUnitId = yearlySummaries.get(unitType).getRentForecastYearly().get(unitId);
                 sumTwoForecastYears(unitStatusForecasts.get(unitStatus), rentForecastYearsForUnitId);
-                unitTypeForecastYearly.setUnitMarketRentYears(unitStatusForecasts);
+                unitTypeForecastYearly.setRentForecastYearly(unitStatusForecasts);
             });
             unitTypeForecastYearlyMap.put(unitTypeForecast.getUnitType(), unitTypeForecastYearly);
         });

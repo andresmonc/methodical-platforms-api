@@ -10,5 +10,5 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UnitTypeForecastYearly {
     private List<RentForecastYear> unitTypeForecast;
-    private Map<String, List<RentForecastYear>> unitMarketRentYears;
+    private Map<String, List<RentForecastYear>> rentForecastYearly;
 }

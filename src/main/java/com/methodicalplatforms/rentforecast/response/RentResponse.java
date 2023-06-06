@@ -11,8 +11,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RentResponse {
     private Map<String, UnitTypeForecastMonthly> unitTypeMarketRentMonths;
-    private Map<String, UnitTypeForecastYearly> unitTypeMarketRentYears;
-
-
+    // These should be under a separate endpoint but since input comes from front end it doesn't make sense to recalculate everything multiple times
+    private Map<String, UnitTypeForecastYearly> unitTypeForecastRentYears;
     private Map<String, UnitTypeForecastYearly> unitTypeUnitStatusView;
 }
