@@ -18,7 +18,6 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RentForecastServiceTest {
 
@@ -261,10 +260,13 @@ class RentForecastServiceTest {
         assertNotEquals(BigDecimal.ZERO, readySummary.get(0).getMarketRent());
 
         // test year 0
-        assertEquals(0, readySummary.get(0).getMarketRent().compareTo(BigDecimal.valueOf(4300)));
-        assertEquals(0, readySummary.get(0).getActualRent().compareTo(BigDecimal.valueOf(4000)));
+        var year0Ready = readySummary.get(0);
+        assertEquals(0, year0Ready.getMarketRent().compareTo(BigDecimal.valueOf(4300)));
+        assertEquals(0, year0Ready.getActualRent().compareTo(BigDecimal.valueOf(4000)));
 
-        System.out.println(readySummary);
+        var year0NotReady = notReadySummary.get(0);
+        assertEquals(0, year0NotReady.getMarketRent().compareTo(BigDecimal.valueOf(17200)));
+        assertEquals(0, year0NotReady.getActualRent().compareTo(BigDecimal.valueOf(8000)));
     }
 
 
