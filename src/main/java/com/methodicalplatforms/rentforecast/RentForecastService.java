@@ -176,6 +176,12 @@ public class RentForecastService {
         return unitTypeSummary;
     }
 
+    /**
+     * Forecast rents for all units for a given unit type
+     *
+     * @param unitTypeForecast - the unit type forecast details
+     * @return - unit forecasts
+     */
     private Map<String, List<RentForecastMonth>> forecastMonthlyRentsForAllUnits(UnitTypeForecast unitTypeForecast) {
         Map<String, List<RentForecastMonth>> unitForecasts = new HashMap<>();
 
