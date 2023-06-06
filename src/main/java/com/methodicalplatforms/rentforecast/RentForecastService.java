@@ -180,20 +180,25 @@ public class RentForecastService {
         Map<String, List<RentForecastMonth>> unitForecasts = new HashMap<>();
 
         // Sort the escalation months
-        List<ForecastMonth> sortedForecastMonths = unitTypeForecast.getForecastMonthData().stream().sorted(Comparator.comparingInt(ForecastMonth::getYear).thenComparingInt(ForecastMonth::getMonth)).toList();
+        List<ForecastMonth> sortedForecastMonths = unitTypeForecast.getForecastMonthData().stream()
+                .sorted(Comparator.comparingInt(ForecastMonth::getYear).thenComparingInt(ForecastMonth::getMonth))
+                .toList();
 
-        // Process Units concurrently
-        List<CompletableFuture<Void>> futures = unitTypeForecast.getUnitDetails().entrySet().stream().map(entry -> CompletableFuture.supplyAsync(() -> {
+        // Process Units sequentially
+        for (Map.Entry<String, UnitDetails> entry : unitTypeForecast.getUnitDetails().entrySet()) {
+            String unitKey = entry.getKey();
             UnitDetails unitDetails = entry.getValue();
-            List<RentForecastMonth> forecastedRentsByMonth = forecastRentsByMonthForUnit(sortedForecastMonths, unitTypeForecast.getExcessRentAdjustmentRate(), unitDetails);
-            return Map.entry(entry.getKey(), forecastedRentsByMonth);
-        })).map(future -> future.thenAcceptAsync(entry -> unitForecasts.put(entry.getKey(), entry.getValue()))).toList();
 
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
-        allFutures.join();
-
+            List<RentForecastMonth> forecastedRentsByMonth = forecastRentsByMonthForUnit(
+                    sortedForecastMonths,
+                    unitTypeForecast.getExcessRentAdjustmentRate(),
+                    unitDetails
+            );
+            unitForecasts.put(unitKey, forecastedRentsByMonth);
+        }
         return unitForecasts;
     }
+
 
 
     /**

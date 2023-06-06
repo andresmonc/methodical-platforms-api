@@ -226,6 +226,34 @@ class RentForecastServiceTest {
         assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(6400)));
     }
 
+    @Test
+    void calculateMarketRentYearlySummaryMultipleUnitType2() {
+        var request = createMarketRentRequest(
+                true,
+                UnitTypeForecast.builder()
+                        .unitType(UNIT_TYPE_1BR_1BATH)
+                        .unitDetails(Map.of(
+                                UNIT_101, UnitDetails.builder().unitStatus("READY").startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(1000)).build(),
+                                UNIT_102, UnitDetails.builder().unitStatus("NOT READY").startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build()
+                        ))
+                        .forecastMonthData(List.of(
+                                // First Unit
+                                createForecastMonth(0, 0, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
+                                createForecastMonth(0, 1, BigDecimal.ZERO, BigDecimal.valueOf(.10)),
+                                createForecastMonth(0, 2, BigDecimal.ZERO, BigDecimal.valueOf(.10)),
+                                createForecastMonth(0, 3, BigDecimal.ZERO, BigDecimal.valueOf(.10))
+                        )).build()
+        );
+
+        var marketValueResponse = rentForecastService.forecastRents(request);
+        var unitTypeUnitStatusView = marketValueResponse.getUnitTypeUnitStatusView().get(UNIT_TYPE_1BR_1BATH);
+        var unitTypeUnitStatus1Br1Bath = unitTypeUnitStatusView.getUnitMarketRentYears();
+        var readySummary = unitTypeUnitStatus1Br1Bath.get("READY");
+        var notReadySummary = unitTypeUnitStatus1Br1Bath.get("READY");
+
+        System.out.println(readySummary);
+    }
+
 
     private RentForecastRequest createMarketRentRequest(boolean yearlySummaryEnabled, UnitTypeForecast... unitTypeForecastList) {
         return RentForecastRequest.builder()
