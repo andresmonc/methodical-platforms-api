@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class RentForecastServiceTest {
@@ -249,8 +250,10 @@ class RentForecastServiceTest {
         var unitTypeUnitStatusView = marketValueResponse.getUnitTypeUnitStatusView().get(UNIT_TYPE_1BR_1BATH);
         var unitTypeUnitStatus1Br1Bath = unitTypeUnitStatusView.getUnitMarketRentYears();
         var readySummary = unitTypeUnitStatus1Br1Bath.get("READY");
-        var notReadySummary = unitTypeUnitStatus1Br1Bath.get("READY");
+        var notReadySummary = unitTypeUnitStatus1Br1Bath.get("NOT READY");
 
+        assertNotEquals(BigDecimal.ZERO, notReadySummary.get(0).getActualRent());
+        assertNotEquals(BigDecimal.ZERO, notReadySummary.get(0).getMarketRent());
         System.out.println(readySummary);
     }
 

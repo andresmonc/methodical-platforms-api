@@ -331,7 +331,7 @@ public class RentForecastService {
             RentForecastYear forecastYearTo = forecastYearsToAddTo.get(i);
 
             forecastYearTo.setActualRent(forecastYearTo.getActualRent().add(forecastYearFrom.getActualRent()));
-            forecastYearFrom.setMarketRent(forecastYearTo.getMarketRent().add(forecastYearFrom.getMarketRent()));
+            forecastYearTo.setMarketRent(forecastYearTo.getMarketRent().add(forecastYearFrom.getMarketRent()));
         }
     }
 
