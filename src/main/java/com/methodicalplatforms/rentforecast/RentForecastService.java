@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class RentForecastService {
      * @return - forecast response
      */
     public RentResponse forecastRents(RentForecastRequest rentForecastRequest) {
-        Map<String, UnitTypeForecastMonthly> rentByMonths = forecastRentsForAllUnitTypes(rentForecastRequest.getUnitTypeForecastList());
+        Map<String, UnitTypeForecastMonthly> rentByMonths = forecastRentsForAllUnitTypes(rentForecastRequest.getUnitTypeForecastList(), rentForecastRequest.getClosingDate());
 
         RentResponse.RentResponseBuilder rentResponseBuilder = RentResponse.builder();
         RentForecastOptions options = rentForecastRequest.getOptions();
@@ -134,11 +135,11 @@ public class RentForecastService {
      * @param unitTypeForecastList - the list of unit types and their corresponding forecast data
      * @return - a map of forecasts by unit type
      */
-    private Map<String, UnitTypeForecastMonthly> forecastRentsForAllUnitTypes(List<UnitTypeForecast> unitTypeForecastList) {
+    private Map<String, UnitTypeForecastMonthly> forecastRentsForAllUnitTypes(List<UnitTypeForecast> unitTypeForecastList, LocalDate closingDate) {
         Map<String, UnitTypeForecastMonthly> forecastDataByUnitTypeMonthly = new HashMap<>();
 
         List<CompletableFuture<Void>> futures = unitTypeForecastList.stream().map(unitTypeForecast -> CompletableFuture.supplyAsync(() -> {
-            Map<String, List<RentForecastMonth>> unitForecasts = forecastMonthlyRentsForAllUnits(unitTypeForecast);
+            Map<String, List<RentForecastMonth>> unitForecasts = forecastMonthlyRentsForAllUnits(unitTypeForecast, closingDate);
             List<RentForecastMonth> unitTypeSummary = summarizeUnitType(unitForecasts);
 
             UnitTypeForecastMonthly unitTypeForecastMonthly = UnitTypeForecastMonthly.builder().unitTypeForecast(unitTypeSummary).unitForecasts(unitForecasts).build();
@@ -182,7 +183,7 @@ public class RentForecastService {
      * @param unitTypeForecast - the unit type forecast details
      * @return - unit forecasts
      */
-    private Map<String, List<RentForecastMonth>> forecastMonthlyRentsForAllUnits(UnitTypeForecast unitTypeForecast) {
+    private Map<String, List<RentForecastMonth>> forecastMonthlyRentsForAllUnits(UnitTypeForecast unitTypeForecast, LocalDate closingDate) {
         Map<String, List<RentForecastMonth>> unitForecasts = new HashMap<>();
 
         // Sort the escalation months
@@ -198,13 +199,12 @@ public class RentForecastService {
             List<RentForecastMonth> forecastedRentsByMonth = forecastRentsByMonthForUnit(
                     sortedForecastMonths,
                     unitTypeForecast.getExcessRentAdjustmentRate(),
-                    unitDetails
+                    unitDetails, closingDate
             );
             unitForecasts.put(unitKey, forecastedRentsByMonth);
         }
         return unitForecasts;
     }
-
 
 
     /**
@@ -213,22 +213,31 @@ public class RentForecastService {
      * @param forecastMonths           - contains the data for each month in question
      * @param excessRentAdjustmentRate - the rate in which to modify loss to lease
      * @param unitDetails              - the details for a particular unit
+     * @param closingDate              - the closing date for the property
      * @return - forecasted data for a unit
      */
     private List<RentForecastMonth> forecastRentsByMonthForUnit(List<ForecastMonth> forecastMonths, BigDecimal
-            excessRentAdjustmentRate, UnitDetails unitDetails) {
+            excessRentAdjustmentRate, UnitDetails unitDetails, LocalDate closingDate) {
         List<RentForecastMonth> forecastedRentsByMonth = new ArrayList<>();
 
-        // Track the rent values for the unit
+        // Track values during calculation
         BigDecimal marketRent = Objects.requireNonNullElse(unitDetails.getStartingMarketRent(), BigDecimal.ZERO);
         BigDecimal actualRent = Objects.requireNonNullElse(unitDetails.getStartingActualRent(), BigDecimal.ZERO);
         BigDecimal compoundedActualEscalationRate = BigDecimal.ONE;
         BigDecimal marketEscalationRate = BigDecimal.ONE;
+        boolean unitStarted = false;
 
 
         for (int i = 0; i < forecastMonths.size(); i++) {
             // Get current month
             ForecastMonth forecastMonth = forecastMonths.get(i);
+
+            if (!unitStarted) {
+                if (!isUnitStarted(forecastMonth, closingDate, unitDetails.getStartDate())) {
+                    continue;
+                }
+                unitStarted = true;
+            }
 
             BigDecimal currentMonthActualEscalationRate = BigDecimal.ONE;
             // Only escalate actual if it's the month after contract end
@@ -378,6 +387,20 @@ public class RentForecastService {
     private boolean isEscalationMonthForActual(UnitDetails unitDetails, int currentMonth) {
         // this works because our array is 0 indexed, so if we renew every 6 months, index 6 would actually be the 7th month
         return unitDetails.getContractTerm() != null && (currentMonth % unitDetails.getContractTerm()) == 0;
+    }
+
+    private boolean isUnitStarted(ForecastMonth forecastMonth, LocalDate closingDate, LocalDate unitStartDate) {
+        if(closingDate == null || unitStartDate == null){
+            return true;
+        }
+        // Calculate the calculation date and set it to the last day of the month
+        // this is to make sure that if a unit starts on the last day of the month or middle of the month
+        // it will reflect in following month actual
+        // todo: in v2 we would prorate and this would need to change
+        LocalDate calcDateLastDayOfMonth = closingDate.withMonth(forecastMonth.getMonth())
+                .plusYears(forecastMonth.getYear())
+                .withDayOfMonth(closingDate.lengthOfMonth());
+        return calcDateLastDayOfMonth.isAfter(unitStartDate);
     }
 
 }
