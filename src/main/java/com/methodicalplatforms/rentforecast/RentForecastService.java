@@ -235,7 +235,7 @@ public class RentForecastService {
             if (isEscalationMonthForActual(unitDetails, i)) {
                 currentMonthActualEscalationRate = compoundedActualEscalationRate;
             }
-
+            
             // Forecast rents for month in question
             BigDecimal forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(unitDetails.getStartingActualRent(), actualRent, currentMonthActualEscalationRate);
             BigDecimal forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(marketEscalationRate, marketRent, forecastedActualRent, excessRentAdjustmentRate);
@@ -296,6 +296,13 @@ public class RentForecastService {
         return unitTypeForecastYearlyMap;
     }
 
+    /**
+     * summarize yearly data for units by status
+     *
+     * @param yearlySummaries   - yearly summary data for all units
+     * @param unitTypeForecasts - unit type forecast data
+     * @return
+     */
     private Map<String, UnitTypeForecastYearly> summarizeByUnitStatus(Map<String, UnitTypeForecastYearly> yearlySummaries, List<UnitTypeForecast> unitTypeForecasts) {
         Map<String, UnitTypeForecastYearly> unitTypeForecastYearlyMap = new HashMap<>();
         unitTypeForecasts.forEach(unitTypeForecast -> {
@@ -326,7 +333,7 @@ public class RentForecastService {
         for (int i = 0; i < forecastYearsToAddFrom.size(); i++) {
             RentForecastYear forecastYearFrom = forecastYearsToAddFrom.get(i);
             if (forecastYearsToAddTo.size() <= i) {
-                forecastYearsToAddTo.add(RentForecastYear.builder().marketRent(BigDecimal.ZERO).actualRent(BigDecimal.ZERO).build());
+                forecastYearsToAddTo.add(RentForecastYear.builder().year(forecastYearFrom.getYear()).marketRent(BigDecimal.ZERO).actualRent(BigDecimal.ZERO).build());
             }
             RentForecastYear forecastYearTo = forecastYearsToAddTo.get(i);
 
