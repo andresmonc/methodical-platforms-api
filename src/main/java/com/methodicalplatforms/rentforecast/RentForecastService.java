@@ -383,9 +383,9 @@ public class RentForecastService {
         // this is to make sure that if a unit starts on the last day of the month or middle of the month
         // it will reflect in following month actual
         // todo: in v2 we would prorate and this would need to change
-        LocalDate calcDateLastDayOfMonth = closingDate.withMonth(forecastMonth.getMonth())
-                .plusYears(forecastMonth.getYear())
-                .withDayOfMonth(closingDate.lengthOfMonth());
+        LocalDate calcDate = closingDate.withMonth(forecastMonth.getMonth())
+                .plusYears(forecastMonth.getYear());
+        LocalDate calcDateLastDayOfMonth = calcDate.withDayOfMonth(calcDate.lengthOfMonth());
         return calcDateLastDayOfMonth.isAfter(unitStartDate);
     }
 
