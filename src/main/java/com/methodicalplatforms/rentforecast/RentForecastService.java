@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 public class RentForecastService {
@@ -125,21 +126,21 @@ public class RentForecastService {
      * @return - a map of forecasts by unit type
      */
     private Map<String, UnitTypeForecastMonthly> forecastRentsForAllUnitTypes(List<UnitTypeForecast> unitTypeForecastList, LocalDate closingDate) {
-        Map<String, UnitTypeForecastMonthly> forecastDataByUnitTypeMonthly = new HashMap<>();
+        return unitTypeForecastList.parallelStream()
+                .map(unitTypeForecast -> {
+                    Map<String, List<RentForecastMonth>> unitForecasts = forecastMonthlyRentsForAllUnits(unitTypeForecast, closingDate);
+                    List<RentForecastMonth> unitTypeSummary = summarizeUnitType(unitForecasts);
 
-        List<CompletableFuture<Void>> futures = unitTypeForecastList.stream().map(unitTypeForecast -> CompletableFuture.supplyAsync(() -> {
-            Map<String, List<RentForecastMonth>> unitForecasts = forecastMonthlyRentsForAllUnits(unitTypeForecast, closingDate);
-            List<RentForecastMonth> unitTypeSummary = summarizeUnitType(unitForecasts);
+                    UnitTypeForecastMonthly unitTypeForecastMonthly = UnitTypeForecastMonthly.builder()
+                            .unitTypeForecast(unitTypeSummary)
+                            .unitForecasts(unitForecasts)
+                            .build();
 
-            UnitTypeForecastMonthly unitTypeForecastMonthly = UnitTypeForecastMonthly.builder().unitTypeForecast(unitTypeSummary).unitForecasts(unitForecasts).build();
-            return Map.entry(unitTypeForecast.getUnitType(), unitTypeForecastMonthly);
-        })).map(future -> future.thenAcceptAsync(entry -> forecastDataByUnitTypeMonthly.put(entry.getKey(), entry.getValue()))).toList();
-
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
-        allFutures.join();
-
-        return forecastDataByUnitTypeMonthly;
+                    return Map.entry(unitTypeForecast.getUnitType(), unitTypeForecastMonthly);
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
+
 
     /**
      * Sum up individual units for a given Unit Type to provide a summary
@@ -173,26 +174,22 @@ public class RentForecastService {
      * @return - unit forecasts
      */
     private Map<String, List<RentForecastMonth>> forecastMonthlyRentsForAllUnits(UnitTypeForecast unitTypeForecast, LocalDate closingDate) {
-        Map<String, List<RentForecastMonth>> unitForecasts = new HashMap<>();
-
         // Sort the escalation months
         List<ForecastMonth> sortedForecastMonths = unitTypeForecast.getForecastMonthData().stream()
                 .sorted(Comparator.comparingInt(ForecastMonth::getYear).thenComparingInt(ForecastMonth::getMonth))
                 .toList();
 
-        // Process Units sequentially
-        for (Map.Entry<String, UnitDetails> entry : unitTypeForecast.getUnitDetails().entrySet()) {
-            String unitKey = entry.getKey();
-            UnitDetails unitDetails = entry.getValue();
+        // Process units using stream
+        return unitTypeForecast.getUnitDetails().entrySet().parallelStream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+                    UnitDetails unitDetails = entry.getValue();
 
-            List<RentForecastMonth> forecastedRentsByMonth = forecastRentsByMonthForUnit(
-                    sortedForecastMonths,
-                    unitTypeForecast.getExcessRentAdjustmentRate(),
-                    unitDetails, closingDate
-            );
-            unitForecasts.put(unitKey, forecastedRentsByMonth);
-        }
-        return unitForecasts;
+                    return forecastRentsByMonthForUnit(
+                            sortedForecastMonths,
+                            unitTypeForecast.getExcessRentAdjustmentRate(),
+                            unitDetails, closingDate
+                    );
+                }));
     }
 
 
