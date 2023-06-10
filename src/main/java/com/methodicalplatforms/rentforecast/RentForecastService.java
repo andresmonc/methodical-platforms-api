@@ -219,7 +219,7 @@ public class RentForecastService {
             excessRentAdjustmentRate, UnitDetails unitDetails) {
         List<RentForecastMonth> forecastedRentsByMonth = new ArrayList<>();
 
-        // Track the rent values for the unit type
+        // Track the rent values for the unit
         BigDecimal marketRent = Objects.requireNonNullElse(unitDetails.getStartingMarketRent(), BigDecimal.ZERO);
         BigDecimal actualRent = Objects.requireNonNullElse(unitDetails.getStartingActualRent(), BigDecimal.ZERO);
         BigDecimal compoundedActualEscalationRate = BigDecimal.ONE;
@@ -235,7 +235,7 @@ public class RentForecastService {
             if (isEscalationMonthForActual(unitDetails, i)) {
                 currentMonthActualEscalationRate = compoundedActualEscalationRate;
             }
-            
+
             // Forecast rents for month in question
             BigDecimal forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(unitDetails.getStartingActualRent(), actualRent, currentMonthActualEscalationRate);
             BigDecimal forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(marketEscalationRate, marketRent, forecastedActualRent, excessRentAdjustmentRate);
