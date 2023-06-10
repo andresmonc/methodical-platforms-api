@@ -3,7 +3,6 @@ package com.methodicalplatforms.rentforecast;
 import com.methodicalplatforms.rentforecast.actual.ActualRentForecastService;
 import com.methodicalplatforms.rentforecast.market.MarketRentForecastService;
 import com.methodicalplatforms.rentforecast.request.ForecastMonth;
-import com.methodicalplatforms.rentforecast.request.RentForecastOptions;
 import com.methodicalplatforms.rentforecast.request.RentForecastRequest;
 import com.methodicalplatforms.rentforecast.request.UnitDetails;
 import com.methodicalplatforms.rentforecast.request.UnitTypeForecast;
@@ -51,24 +50,14 @@ public class RentForecastService {
         Map<String, UnitTypeForecastMonthly> rentByMonths = forecastRentsForAllUnitTypes(rentForecastRequest.getUnitTypeForecastList(), rentForecastRequest.getClosingDate());
 
         RentResponse.RentResponseBuilder rentResponseBuilder = RentResponse.builder();
-        RentForecastOptions options = rentForecastRequest.getOptions();
-        if (options != null && rentForecastRequest.getOptions().getSummarizeByYear()) {
-            // Summarize by Year
-            Map<String, UnitTypeForecastYearly> rentByYears = summarizeYearsForAllUnitTypes(rentByMonths);
-            if (options.getSummarizeByUnitType()) {
-                // Summarize by unit type
-                yearlySummaryByUnitType(rentByYears);
-            }
-            rentResponseBuilder.unitTypeUnitStatusView(summarizeByUnitStatus(rentByYears, rentForecastRequest.getUnitTypeForecastList()));
-            rentResponseBuilder.unitTypeForecastRentYears(rentByYears);
-        } else {
-            // Monthly summary
-            if (options != null && options.getSummarizeByUnitType()) {
-                // Summarize by unit type
-                summarizeAllUnitTypes(rentByMonths);
-            }
-            rentResponseBuilder.unitTypeMarketRentMonths(rentByMonths);
-        }
+        // Summarize by Year
+        Map<String, UnitTypeForecastYearly> rentByYears = summarizeYearsForAllUnitTypes(rentByMonths);
+        yearlySummaryByUnitType(rentByYears);
+        rentResponseBuilder.unitTypeUnitStatusView(summarizeByUnitStatus(rentByYears, rentForecastRequest.getUnitTypeForecastList()));
+        rentResponseBuilder.unitTypeForecastRentYears(rentByYears);
+        // Summarize by unit type
+        summarizeAllUnitTypes(rentByMonths);
+        rentResponseBuilder.unitTypeMarketRentMonths(rentByMonths);
 
         return rentResponseBuilder.build();
     }
