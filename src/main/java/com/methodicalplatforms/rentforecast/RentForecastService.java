@@ -402,6 +402,15 @@ public class RentForecastService {
         return remainder == 0;
     }
 
+    /**
+     * Determine if the current month we're forecasting is the start month
+     *
+     * @param unitDetails
+     * @param currentMonth
+     * @param currentYear
+     * @param closingDate
+     * @return
+     */
     private boolean isStartMonth(UnitDetails unitDetails, int currentMonth, int currentYear, LocalDate closingDate) {
         if (closingDate == null) {
             return false;
@@ -418,6 +427,14 @@ public class RentForecastService {
         return monthsBetween == -1;
     }
 
+    /**
+     * Determine whether or not the unit is already started
+     *
+     * @param forecastMonth
+     * @param closingDate
+     * @param unitStartDate
+     * @return
+     */
     private boolean isUnitStarted(ForecastMonth forecastMonth, LocalDate closingDate, LocalDate unitStartDate) {
         if (closingDate == null) {
             return true;
