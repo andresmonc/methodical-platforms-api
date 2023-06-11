@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -24,7 +26,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -217,22 +218,29 @@ public class RentForecastService {
         for (int i = 0; i < forecastMonths.size(); i++) {
             // Get current month
             ForecastMonth forecastMonth = forecastMonths.get(i);
+            int month = forecastMonth.getMonth();
+            int year = forecastMonth.getYear();
+            boolean isStartMonth = isStartMonth(unitDetails, month, year, closingDate);
 
             if (!unitStarted) {
-                if (!isUnitStarted(forecastMonth, closingDate, unitDetails.getStartDate())) {
-                    continue;
+                if (isUnitStarted(forecastMonth, closingDate, unitDetails.getStartDate())) {
+                    unitStarted = true;
                 }
-                unitStarted = true;
             }
 
             BigDecimal currentMonthActualEscalationRate = BigDecimal.ONE;
             // Only escalate actual if it's the month after contract end
-            if (isEscalationMonthForActual(unitDetails, i)) {
+            if (unitStarted && (isEscalationMonthForActual(unitDetails, month, year, closingDate) || isStartMonth)) {
                 currentMonthActualEscalationRate = compoundedActualEscalationRate;
             }
 
             // Forecast rents for month in question
-            BigDecimal forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(unitDetails.getStartingActualRent(), actualRent, currentMonthActualEscalationRate);
+            BigDecimal forecastedActualRent = BigDecimal.ZERO;
+            if (isStartMonth) {
+                forecastedActualRent = Objects.requireNonNullElse(unitDetails.getStartingActualRent(), BigDecimal.ZERO);
+            } else if (unitStarted) {
+                forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(unitDetails.getStartingActualRent(), actualRent, currentMonthActualEscalationRate);
+            }
             BigDecimal forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(marketEscalationRate, marketRent, forecastedActualRent, excessRentAdjustmentRate);
 
 
@@ -246,19 +254,28 @@ public class RentForecastService {
             // We want to escalate the market rents the following month, last month/last year discarded if it exists
             marketEscalationRate = BigDecimal.ONE.add(forecastMonth.getMarketEscalationRate());
 
-            RentForecastMonth rentMonth = RentForecastMonth.builder()
-                    .month(forecastMonth.getMonth())
-                    .year(forecastMonth.getYear())
-                    .marketRent(forecastedMarketRent.setScale(DECIMAL_PLACES, RoundingMode.HALF_EVEN))
-                    .actualRent(forecastedActualRent.setScale(DECIMAL_PLACES, RoundingMode.HALF_EVEN))
-                    .build();
-
             // Update the tracker for current market rents for the unit type
-            forecastedRentsByMonth.add(rentMonth);
+            forecastedRentsByMonth.add(newRentForecastMonth(year, month, setScale(forecastedMarketRent), setScale(forecastedActualRent)));
             marketRent = forecastedMarketRent;
             actualRent = forecastedActualRent;
         }
         return forecastedRentsByMonth;
+    }
+
+    private RentForecastMonth newRentForecastMonth(int year, int month, BigDecimal marketRent, BigDecimal actualRent) {
+        return RentForecastMonth.builder()
+                .month(month)
+                .year(year)
+                .marketRent(marketRent)
+                .actualRent(actualRent)
+                .build();
+    }
+
+    private BigDecimal setScale(BigDecimal bigDecimal) {
+        if (BigDecimal.ZERO.compareTo(bigDecimal) == 0) {
+            return bigDecimal;
+        }
+        return bigDecimal.setScale(DECIMAL_PLACES, RoundingMode.HALF_EVEN);
     }
 
 
@@ -370,15 +387,42 @@ public class RentForecastService {
      * @param currentMonth - current month index
      * @return - true or false, whether we should escalate
      */
-    private boolean isEscalationMonthForActual(UnitDetails unitDetails, int currentMonth) {
-        // this works because our array is 0 indexed, so if we renew every 6 months, index 6 would actually be the 7th month
-        return unitDetails.getContractTerm() != null && (currentMonth % unitDetails.getContractTerm()) == 0;
+    private boolean isEscalationMonthForActual(UnitDetails unitDetails, int currentMonth, int currentYear, LocalDate closingDate) {
+        if (closingDate == null || unitDetails.getStartDate() == null) {
+            // this works because our array is 0 indexed, so if we renew every 6 months, index 6 would actually be the 7th month
+            return unitDetails.getContractTerm() != null && (currentMonth % unitDetails.getContractTerm()) == 0;
+        }
+        LocalDate currentDate = LocalDate.of(closingDate.getYear() + currentYear, currentMonth, 1);
+        long monthsBetween = ChronoUnit.MONTHS.between(
+                YearMonth.from(currentDate),
+                YearMonth.from(unitDetails.getStartDate()
+                )
+        );
+        long remainder = monthsBetween % unitDetails.getContractTerm() + 1;
+        return remainder == 0;
+    }
+
+    private boolean isStartMonth(UnitDetails unitDetails, int currentMonth, int currentYear, LocalDate closingDate) {
+        if (closingDate == null) {
+            return false;
+        }
+        LocalDate startDate = unitDetails.getStartDate();
+        if (unitDetails.getStartDate() == null) {
+            startDate = closingDate;
+        }
+        LocalDate currentDate = LocalDate.of(closingDate.getYear() + currentYear, currentMonth, 1);
+        long monthsBetween = ChronoUnit.MONTHS.between(
+                YearMonth.from(currentDate),
+                YearMonth.from(startDate)
+        );
+        return monthsBetween == -1;
     }
 
     private boolean isUnitStarted(ForecastMonth forecastMonth, LocalDate closingDate, LocalDate unitStartDate) {
-        if(closingDate == null || unitStartDate == null){
+        if (closingDate == null) {
             return true;
         }
+
         // Calculate the calculation date and set it to the last day of the month
         // this is to make sure that if a unit starts on the last day of the month or middle of the month
         // it will reflect in following month actual
@@ -386,7 +430,17 @@ public class RentForecastService {
         LocalDate calcDate = closingDate.withMonth(forecastMonth.getMonth())
                 .plusYears(forecastMonth.getYear());
         LocalDate calcDateLastDayOfMonth = calcDate.withDayOfMonth(calcDate.lengthOfMonth());
-        return calcDateLastDayOfMonth.isAfter(unitStartDate);
+        // if calcDate is before closing date we can't start calculating actuals
+        if (!(calcDateLastDayOfMonth.isEqual(closingDate) || calcDateLastDayOfMonth.isAfter(closingDate))) {
+            return false;
+        }
+
+        if (unitStartDate == null) {
+            unitStartDate = closingDate;
+        }
+
+
+        return calcDateLastDayOfMonth.isAfter(unitStartDate.withDayOfMonth(unitStartDate.lengthOfMonth()));
     }
 
 }
