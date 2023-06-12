@@ -177,7 +177,7 @@ class RentForecastServiceTest {
         assertNotNull(marketValueResponse);
         assertEquals(2, marketValueResponse.getUnitTypeForecastRentYears().size());
 
-        var unitType1MarketYear = marketValueResponse.getUnitTypeForecastRentYears().get(unitType).getRentForecastYearly().get(UNIT_101);
+        var unitType1MarketYear = marketValueResponse.getUnitTypeForecastRentYears().get(unitType).getUnitForecasts().get(UNIT_101);
         assertEquals(1, unitType1MarketYear.size());
         var year0MarketValue = unitType1MarketYear.get(0).getMarketRent();
         assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(4300)));
@@ -290,12 +290,12 @@ class RentForecastServiceTest {
         assertNotNull(marketValueResponse);
         assertEquals(3, marketValueResponse.getUnitTypeForecastRentYears().size());
 
-        var unitType1MarketYear = marketValueResponse.getUnitTypeForecastRentYears().get(unitType1).getRentForecastYearly().get(UNIT_101);
+        var unitType1MarketYear = marketValueResponse.getUnitTypeForecastRentYears().get(unitType1).getUnitForecasts().get(UNIT_101);
         assertEquals(1, unitType1MarketYear.size());
         var year0MarketValue = unitType1MarketYear.get(0).getMarketRent();
         assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(4300)));
 
-        var unitType2MarketYear = marketValueResponse.getUnitTypeForecastRentYears().get(unitType2).getRentForecastYearly().get(UNIT_102);
+        var unitType2MarketYear = marketValueResponse.getUnitTypeForecastRentYears().get(unitType2).getUnitForecasts().get(UNIT_102);
         assertEquals(1, unitType2MarketYear.size());
         year0MarketValue = unitType2MarketYear.get(0).getMarketRent();
         assertEquals(0, year0MarketValue.compareTo(BigDecimal.valueOf(6400)));
@@ -323,7 +323,7 @@ class RentForecastServiceTest {
 
         var forecastResponse = rentForecastService.forecastRents(request);
         var unitTypeUnitStatusView = forecastResponse.getUnitTypeUnitStatusView().get(UNIT_TYPE_1BR_1BATH);
-        var unitTypeUnitStatus1Br1Bath = unitTypeUnitStatusView.getRentForecastYearly();
+        var unitTypeUnitStatus1Br1Bath = unitTypeUnitStatusView.getUnitForecasts();
         var readySummary = unitTypeUnitStatus1Br1Bath.get("READY");
         var notReadySummary = unitTypeUnitStatus1Br1Bath.get("NOT READY");
 
