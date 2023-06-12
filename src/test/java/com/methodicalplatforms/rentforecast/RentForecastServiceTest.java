@@ -90,9 +90,9 @@ class RentForecastServiceTest {
         var marketValueResponse = rentForecastService.forecastRents(request);
 
         assertNotNull(marketValueResponse);
-        assertEquals(2, marketValueResponse.getUnitTypeMarketRentMonths().size());
+        assertEquals(2, marketValueResponse.getUnitTypeForecastRentMonths().size());
 
-        var marketRentMonths = marketValueResponse.getUnitTypeMarketRentMonths().get(UNIT_TYPE_1BR_1BATH).getUnitForecasts().get(UNIT_101);
+        var marketRentMonths = marketValueResponse.getUnitTypeForecastRentMonths().get(UNIT_TYPE_1BR_1BATH).getUnitForecasts().get(UNIT_101);
         assertEquals(36, marketRentMonths.size());
         assertEquals(0, BigDecimal.valueOf(1050.00).compareTo(marketRentMonths.get(4).getMarketRent()));
         assertEquals(2, marketRentMonths.get(1).getMonth(), "Response is not sorted");
@@ -143,13 +143,13 @@ class RentForecastServiceTest {
         var forecastResponse = rentForecastService.forecastRents(request);
 
         assertNotNull(forecastResponse);
-        assertEquals(3, forecastResponse.getUnitTypeMarketRentMonths().size());
+        assertEquals(3, forecastResponse.getUnitTypeForecastRentMonths().size());
 
-        var marketRentMonths1 = forecastResponse.getUnitTypeMarketRentMonths().get(UNIT_TYPE_1BR_1BATH).getUnitForecasts().get(UNIT_101);
+        var marketRentMonths1 = forecastResponse.getUnitTypeForecastRentMonths().get(UNIT_TYPE_1BR_1BATH).getUnitForecasts().get(UNIT_101);
         assertEquals(4, marketRentMonths1.size());
         assertEquals(0, BigDecimal.valueOf(1100).compareTo(marketRentMonths1.get(1).getMarketRent()));
 
-        var marketRentMonths2 = forecastResponse.getUnitTypeMarketRentMonths().get(unitType2).getUnitForecasts().get("102");
+        var marketRentMonths2 = forecastResponse.getUnitTypeForecastRentMonths().get(unitType2).getUnitForecasts().get("102");
         assertEquals(3, marketRentMonths2.size());
         assertEquals(0, BigDecimal.valueOf(2200).compareTo(marketRentMonths2.get(1).getMarketRent()));
     }
@@ -241,9 +241,9 @@ class RentForecastServiceTest {
         var marketValueResponse = rentForecastService.forecastRents(request);
 
         assertNotNull(marketValueResponse);
-        assertEquals(2, marketValueResponse.getUnitTypeMarketRentMonths().size());
+        assertEquals(2, marketValueResponse.getUnitTypeForecastRentMonths().size());
 
-        var forecastMonths = marketValueResponse.getUnitTypeMarketRentMonths().get(UNIT_TYPE_1BR_1BATH).getUnitForecasts().get(UNIT_101);
+        var forecastMonths = marketValueResponse.getUnitTypeForecastRentMonths().get(UNIT_TYPE_1BR_1BATH).getUnitForecasts().get(UNIT_101);
         assertEquals(36, forecastMonths.size());
         assertEquals(0, BigDecimal.valueOf(1050.00).compareTo(forecastMonths.get(4).getMarketRent()));
         assertEquals(2, forecastMonths.get(1).getMonth(), "Response is not sorted");

@@ -59,7 +59,7 @@ public class RentForecastService {
         rentResponseBuilder.unitTypeForecastRentYears(rentByYears);
         // Summarize by unit type
         summarizeAllUnitTypes(rentByMonths);
-        rentResponseBuilder.unitTypeMarketRentMonths(rentByMonths);
+        rentResponseBuilder.unitTypeForecastRentMonths(rentByMonths);
 
         return rentResponseBuilder.build();
     }
