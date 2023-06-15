@@ -157,11 +157,10 @@ public class RentForecastService {
                 RentForecastMonth rentForecastMonth = rentForecastMonths.get(i);
                 if (unitTypeSummary.size() <= i) {
                     unitTypeSummary.add(RentForecastMonth.builder().marketRent(BigDecimal.ZERO).actualRent(BigDecimal.ZERO).month(rentForecastMonth.getMonth()).year(rentForecastMonth.getYear()).build());
-                } else {
-                    RentForecastMonth unitTypeRentforecastMonth = unitTypeSummary.get(i);
-                    unitTypeRentforecastMonth.setActualRent(unitTypeRentforecastMonth.getActualRent().add(rentForecastMonth.getActualRent()));
-                    unitTypeRentforecastMonth.setMarketRent(unitTypeRentforecastMonth.getMarketRent().add(rentForecastMonth.getMarketRent()));
                 }
+                RentForecastMonth unitTypeRentforecastMonth = unitTypeSummary.get(i);
+                unitTypeRentforecastMonth.setActualRent(unitTypeRentforecastMonth.getActualRent().add(rentForecastMonth.getActualRent()));
+                unitTypeRentforecastMonth.setMarketRent(unitTypeRentforecastMonth.getMarketRent().add(rentForecastMonth.getMarketRent()));
             }
 
         });

@@ -341,6 +341,33 @@ class RentForecastServiceTest {
         assertEquals(0, year0NotReady.getActualRent().compareTo(BigDecimal.valueOf(8000)));
     }
 
+    @Test
+    public void multipleUnitsMonthlySummaryCorrectAddition() {
+        var request = createMarketRentRequest(
+                UnitTypeForecast.builder()
+                        .unitType(UNIT_TYPE_1BR_1BATH)
+                        .unitDetails(Map.of(
+                                UNIT_101, UnitDetails.builder().unitStatus("READY").startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build(),
+                                UNIT_102, UnitDetails.builder().unitStatus("NOT READY").startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build(),
+                                "103", UnitDetails.builder().unitStatus("NOT READY").startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build()
+
+                        ))
+                        .forecastMonthData(List.of(
+                                // First Unit
+                                createForecastMonth(1, 1, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
+                                createForecastMonth(1, 2, BigDecimal.ZERO, BigDecimal.valueOf(.10)),
+                                createForecastMonth(1, 3, BigDecimal.ZERO, BigDecimal.valueOf(.10)),
+                                createForecastMonth(1, 4, BigDecimal.ZERO, BigDecimal.valueOf(.10))
+                        )).build()
+        );
+
+        var forecastResponse = rentForecastService.forecastRents(request);
+
+        var year1Month1Forecast = forecastResponse.getUnitTypeForecastRentMonths().get(UNIT_TYPE_1BR_1BATH).getUnitTypeForecast().get(0);
+        assertEquals(0, year1Month1Forecast.getMarketRent().compareTo(BigDecimal.valueOf(6000)));
+        assertEquals(0, year1Month1Forecast.getActualRent().compareTo(BigDecimal.valueOf(3000)));
+    }
+
 
     private RentForecastRequest createMarketRentRequest(UnitTypeForecast... unitTypeForecastList) {
         var request = new RentForecastRequest();
