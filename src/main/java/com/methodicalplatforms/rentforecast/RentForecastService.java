@@ -177,7 +177,7 @@ public class RentForecastService {
         // Sort the escalation months
         List<ForecastMonth> sortedForecastMonths = unitTypeForecast.getForecastMonthData().stream()
                 .sorted(Comparator.comparingInt(ForecastMonth::getYear).thenComparingInt(ForecastMonth::getMonth))
-                .toList();
+                .collect(Collectors.toList());
 
         // Process units using stream
         return unitTypeForecast.getUnitDetails().entrySet().parallelStream()
@@ -376,7 +376,7 @@ public class RentForecastService {
         });
 
         // Convert the map to a list of RentYear objects
-        return yearSummaries.values().stream().toList();
+        return yearSummaries.values().stream().collect(Collectors.toList());
     }
 
     /**
