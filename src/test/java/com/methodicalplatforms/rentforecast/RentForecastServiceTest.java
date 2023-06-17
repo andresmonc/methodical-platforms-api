@@ -43,46 +43,7 @@ class RentForecastServiceTest {
                                 .startingActualRent(BigDecimal.valueOf(700)).build())
                         )
                         .excessRentAdjustmentRate(BigDecimal.valueOf(.15))
-                        .forecastMonthData(
-                                List.of(
-                                        createForecastMonth(0, 1, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 3, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 2, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 4, BigDecimal.valueOf(.05), BigDecimal.valueOf(.30)),
-                                        createForecastMonth(0, 5, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 6, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 7, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 8, BigDecimal.valueOf(.05), BigDecimal.valueOf(.30)),
-                                        createForecastMonth(0, 9, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 10, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 11, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(0, 12, BigDecimal.valueOf(.04), BigDecimal.valueOf(.30)),
-                                        createForecastMonth(1, 1, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(1, 2, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(1, 3, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(1, 4, BigDecimal.valueOf(.04), BigDecimal.valueOf(.04)),
-                                        createForecastMonth(1, 5, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(1, 6, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(1, 7, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(1, 8, BigDecimal.valueOf(.04), BigDecimal.valueOf(.04)),
-                                        createForecastMonth(1, 9, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(1, 10, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(1, 11, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(1, 12, BigDecimal.valueOf(.05), BigDecimal.valueOf(.04)),
-                                        createForecastMonth(2, 1, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(2, 2, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(2, 3, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(2, 4, BigDecimal.valueOf(.05), BigDecimal.valueOf(.03)),
-                                        createForecastMonth(2, 5, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(2, 6, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(2, 7, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(2, 8, BigDecimal.valueOf(.05), BigDecimal.valueOf(.03)),
-                                        createForecastMonth(2, 9, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(2, 10, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(2, 11, BigDecimal.ZERO, BigDecimal.ZERO),
-                                        createForecastMonth(2, 12, BigDecimal.valueOf(.02), BigDecimal.valueOf(.03))
-                                )
-                        )
+                        .forecastMonthData(forecastMonthTestData())
                         .build()
         );
         request.setClosingDate(LocalDate.of(2020,1,1));
