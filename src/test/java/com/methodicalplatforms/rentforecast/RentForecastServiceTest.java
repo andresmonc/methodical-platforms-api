@@ -324,7 +324,6 @@ class RentForecastServiceTest {
                                                 .startingActualRent(BigDecimal.valueOf(700)).build()
                                 )
                         )
-                        .excessRentAdjustmentRate(BigDecimal.valueOf(.15))
                         .forecastMonthData(forecastMonthTestData())
                         .build()
 
@@ -333,9 +332,14 @@ class RentForecastServiceTest {
         System.out.println(forecastResponse);
         var year1Summary4Bed = forecastResponse.getUnitTypeForecastRentYears().get(fourBed).getUnitTypeForecast().get(0);
         var year1Summary4BedNewConstruction = forecastResponse.getUnitTypeUnitStatusView().get(fourBed).getUnitForecasts().get(newConstruction).get(0);
+        var year1Summary4BedMarketRent = forecastResponse.getUnitTypeForecastRentYears().get(fourBed).getUnitTypeForecast().get(0).getMarketRent();
+        var year1Summary4BedNewConstructionMarketRent = forecastResponse.getUnitTypeUnitStatusView().get(fourBed).getUnitForecasts().get(newConstruction).get(0).getMarketRent();
+
         assertEquals(0, year1Summary4Bed.getYear());
         assertEquals(0, year1Summary4BedNewConstruction.getYear());
-        assertEquals(0, year1Summary4Bed.getMarketRent().compareTo(year1Summary4BedNewConstruction.getMarketRent()));
+
+        assertEquals(0, year1Summary4BedNewConstructionMarketRent.compareTo(BigDecimal.valueOf(1412320)));
+        assertEquals(0, year1Summary4BedMarketRent.compareTo(BigDecimal.valueOf(1412320)));
     }
 
 
