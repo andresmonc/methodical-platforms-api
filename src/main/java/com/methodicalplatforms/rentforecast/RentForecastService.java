@@ -108,7 +108,10 @@ public class RentForecastService {
             for (int i = 0; i < rentForecastYearly.getUnitTypeForecast().size(); i++) {
                 RentForecastYear rentForecastYear = rentForecastYearly.getUnitTypeForecast().get(i);
                 if (unitTypeSummary.size() <= i) {
-                    unitTypeSummary.add(rentForecastYear);
+                    unitTypeSummary.add(RentForecastYear.builder()
+                            .year(rentForecastYear.getYear())
+                            .actualRent(rentForecastYear.getActualRent())
+                            .marketRent(rentForecastYear.getMarketRent()).build());
                 } else {
                     RentForecastYear unitTypeForecastYear = unitTypeSummary.get(i);
                     unitTypeForecastYear.setActualRent(unitTypeForecastYear.getActualRent().add(rentForecastYear.getActualRent()));
