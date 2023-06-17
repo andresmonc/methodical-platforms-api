@@ -18,6 +18,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RentForecastServiceTest {
 
@@ -288,6 +289,53 @@ class RentForecastServiceTest {
         var year1Month1Forecast = forecastResponse.getUnitTypeForecastRentMonths().get(UNIT_TYPE_1BR_1BATH).getUnitTypeForecast().get(0);
         assertEquals(0, year1Month1Forecast.getMarketRent().compareTo(BigDecimal.valueOf(6000)));
         assertEquals(0, year1Month1Forecast.getActualRent().compareTo(BigDecimal.valueOf(3000)));
+    }
+
+    @Test
+    public void testit() {
+        var fourBed = "4BR/2.5BA";
+        var newConstruction = "New Construction";
+        var request = createMarketRentRequest(
+                UnitTypeForecast.builder()
+                        .unitType(UNIT_TYPE_1BR_1BATH)
+                        .unitDetails(Map.of(
+                                        UNIT_101, UnitDetails.builder()
+                                                .contractTerm(6).unitStatus("REHAB").startingMarketRent(BigDecimal.valueOf(6000))
+                                                .startingActualRent(BigDecimal.valueOf(700)).build(),
+                                        UNIT_102, UnitDetails.builder()
+                                                .contractTerm(6).unitStatus("REHAB").startingMarketRent(BigDecimal.valueOf(6000))
+                                                .startingActualRent(BigDecimal.valueOf(700)).build(),
+                                        "103", UnitDetails.builder()
+                                                .contractTerm(6).unitStatus("REHAB").startingMarketRent(BigDecimal.valueOf(6000))
+                                                .startingActualRent(BigDecimal.valueOf(700)).build()
+                                )
+                        )
+                        .excessRentAdjustmentRate(BigDecimal.valueOf(.15))
+                        .forecastMonthData(forecastMonthTestData())
+                        .build(),
+                UnitTypeForecast.builder()
+                        .unitType(fourBed)
+                        .unitDetails(Map.of(
+                                        UNIT_101, UnitDetails.builder()
+                                                .contractTerm(6).unitStatus(newConstruction).startingMarketRent(BigDecimal.valueOf(56000))
+                                                .startingActualRent(BigDecimal.valueOf(700)).build(),
+                                        UNIT_102, UnitDetails.builder()
+                                                .contractTerm(6).unitStatus(newConstruction).startingMarketRent(BigDecimal.valueOf(56000))
+                                                .startingActualRent(BigDecimal.valueOf(700)).build()
+                                )
+                        )
+                        .excessRentAdjustmentRate(BigDecimal.valueOf(.15))
+                        .forecastMonthData(forecastMonthTestData())
+                        .build()
+
+        );
+        var forecastResponse = rentForecastService.forecastRents(request);
+        System.out.println(forecastResponse);
+        var year1Summary4Bed = forecastResponse.getUnitTypeForecastRentYears().get(fourBed).getUnitTypeForecast().get(0);
+        var year1Summary4BedNewConstruction = forecastResponse.getUnitTypeUnitStatusView().get(fourBed).getUnitForecasts().get(newConstruction).get(0);
+        assertEquals(0, year1Summary4Bed.getYear());
+        assertEquals(0, year1Summary4BedNewConstruction.getYear());
+        assertEquals(0, year1Summary4Bed.getMarketRent().compareTo(year1Summary4BedNewConstruction.getMarketRent()));
     }
 
 
