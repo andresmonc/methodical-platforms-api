@@ -104,15 +104,15 @@ public class RentForecastService {
         UnitTypeForecastYearly allUnitTypeForecastYearly = new UnitTypeForecastYearly();
         List<RentForecastYear> unitTypeSummary = new ArrayList<>();
 
-        rentYearsByUnitType.forEach((unitName, rentForecastMonths) -> {
-            for (int i = 0; i < rentForecastMonths.getUnitTypeForecast().size(); i++) {
-                RentForecastYear rentForecastMonth = rentForecastMonths.getUnitTypeForecast().get(i);
+        rentYearsByUnitType.forEach((unitName, rentForecastYearly) -> {
+            for (int i = 0; i < rentForecastYearly.getUnitTypeForecast().size(); i++) {
+                RentForecastYear rentForecastYear = rentForecastYearly.getUnitTypeForecast().get(i);
                 if (unitTypeSummary.size() <= i) {
-                    unitTypeSummary.add(rentForecastMonth);
+                    unitTypeSummary.add(rentForecastYear);
                 } else {
                     RentForecastYear unitTypeForecastYear = unitTypeSummary.get(i);
-                    unitTypeForecastYear.setActualRent(unitTypeForecastYear.getActualRent().add(rentForecastMonth.getActualRent()));
-                    unitTypeForecastYear.setMarketRent(unitTypeForecastYear.getMarketRent().add(rentForecastMonth.getMarketRent()));
+                    unitTypeForecastYear.setActualRent(unitTypeForecastYear.getActualRent().add(rentForecastYear.getActualRent()));
+                    unitTypeForecastYear.setMarketRent(unitTypeForecastYear.getMarketRent().add(rentForecastYear.getMarketRent()));
                 }
             }
         });
