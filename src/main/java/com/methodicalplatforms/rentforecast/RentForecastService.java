@@ -431,12 +431,12 @@ public class RentForecastService {
     }
 
     /**
-     * Determine whether or not the unit is already started
+     * Determine whether the unit is already started
      *
-     * @param forecastMonth
-     * @param closingDate
-     * @param unitStartDate
-     * @return
+     * @param forecastMonth - the forecastMonth in question to determine calc date
+     * @param closingDate   - the closing date for the property
+     * @param unitStartDate - the start date for the unit
+     * @return - true if unit is started false otherwise
      */
     private boolean isUnitStarted(ForecastMonth forecastMonth, LocalDate closingDate, LocalDate unitStartDate) {
         if (closingDate == null) {
