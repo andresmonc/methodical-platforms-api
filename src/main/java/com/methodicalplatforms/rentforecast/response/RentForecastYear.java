@@ -11,6 +11,12 @@ import java.math.BigDecimal;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RentForecastYear {
     private int year;
-    private BigDecimal marketRent;
-    private BigDecimal actualRent;
+    @Builder.Default
+    private BigDecimal marketRent = BigDecimal.ZERO;
+    @Builder.Default
+    private BigDecimal actualRent = BigDecimal.ZERO;
+    @Builder.Default
+    private BigDecimal fiscalMarketRent = BigDecimal.ZERO;
+    @Builder.Default
+    private BigDecimal fiscalActualRent = BigDecimal.ZERO;
 }

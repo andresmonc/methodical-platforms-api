@@ -6,6 +6,7 @@ import com.methodicalplatforms.rentforecast.request.ForecastMonth;
 import com.methodicalplatforms.rentforecast.request.RentForecastRequest;
 import com.methodicalplatforms.rentforecast.request.UnitDetails;
 import com.methodicalplatforms.rentforecast.request.UnitTypeForecast;
+import com.methodicalplatforms.rentforecast.summary.RentForecastSummaryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,10 +27,13 @@ class RentForecastServiceTest {
     private static final String UNIT_TYPE_1BR_1BATH = "1 BR 1 BATH";
     private static final String UNIT_101 = "101";
     private static final String UNIT_102 = "102";
+    private static final String READY = "READY";
+    private static final String NOT_READY = "NOT READY";
+    
 
     @BeforeEach
     public void setup() {
-        rentForecastService = new RentForecastService(actualRentForecastService, new MarketRentForecastService());
+        rentForecastService = new RentForecastService(actualRentForecastService, new MarketRentForecastService(), new RentForecastSummaryService());
     }
 
     @Test
@@ -228,9 +232,9 @@ class RentForecastServiceTest {
                 UnitTypeForecast.builder()
                         .unitType(UNIT_TYPE_1BR_1BATH)
                         .unitDetails(Map.of(
-                                UNIT_101, UnitDetails.builder().unitStatus("READY").startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(1000)).build(),
-                                UNIT_102, UnitDetails.builder().unitStatus("NOT READY").startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build(),
-                                "103", UnitDetails.builder().unitStatus("NOT READY").startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build()
+                                UNIT_101, UnitDetails.builder().unitStatus(READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(1000)).build(),
+                                UNIT_102, UnitDetails.builder().unitStatus(NOT_READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build(),
+                                "103", UnitDetails.builder().unitStatus(NOT_READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build()
 
                         ))
                         .forecastMonthData(List.of(
@@ -245,8 +249,8 @@ class RentForecastServiceTest {
         var forecastResponse = rentForecastService.forecastRents(request);
         var unitTypeUnitStatusView = forecastResponse.getUnitTypeUnitStatusView().get(UNIT_TYPE_1BR_1BATH);
         var unitTypeUnitStatus1Br1Bath = unitTypeUnitStatusView.getUnitForecasts();
-        var readySummary = unitTypeUnitStatus1Br1Bath.get("READY");
-        var notReadySummary = unitTypeUnitStatus1Br1Bath.get("NOT READY");
+        var readySummary = unitTypeUnitStatus1Br1Bath.get(READY);
+        var notReadySummary = unitTypeUnitStatus1Br1Bath.get(NOT_READY);
 
         assertNotEquals(BigDecimal.ZERO, notReadySummary.get(0).getActualRent());
         assertNotEquals(BigDecimal.ZERO, notReadySummary.get(0).getMarketRent());
@@ -262,15 +266,80 @@ class RentForecastServiceTest {
         assertEquals(0, year0NotReady.getActualRent().compareTo(BigDecimal.valueOf(8000)));
     }
 
+
+    @Test
+    void unitStatusViewYearlyFiscal() {
+        var request = createMarketRentRequest(
+                UnitTypeForecast.builder()
+                        .unitType(UNIT_TYPE_1BR_1BATH)
+                        .unitDetails(Map.of(
+                                UNIT_101, UnitDetails.builder().unitStatus(READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(1000)).build(),
+                                UNIT_102, UnitDetails.builder().unitStatus(NOT_READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build(),
+                                "103", UnitDetails.builder().unitStatus(NOT_READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build()
+
+                        ))
+                        .forecastMonthData(List.of(
+                                // First Unit
+                                createForecastMonth(1, 6, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
+                                createForecastMonth(1, 7, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
+                                createForecastMonth(1, 8, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
+                                createForecastMonth(1, 9, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
+                                createForecastMonth(1, 10, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
+                                createForecastMonth(1, 11, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
+                                createForecastMonth(1, 12, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
+                                createForecastMonth(2, 1, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
+                                createForecastMonth(2, 2, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10))
+
+                        )).build()
+        );
+        // Closing date required for fiscal
+        request.setClosingDate(LocalDate.of(2023,6,6));
+
+        var forecastResponse = rentForecastService.forecastRents(request);
+        var unitTypeUnitStatusView = forecastResponse.getUnitTypeUnitStatusView().get(UNIT_TYPE_1BR_1BATH);
+        var unitTypeUnitStatus1Br1Bath = unitTypeUnitStatusView.getUnitForecasts();
+        var readySummary = unitTypeUnitStatus1Br1Bath.get(READY);
+        var notReadySummary = unitTypeUnitStatus1Br1Bath.get(NOT_READY);
+
+        assertNotEquals(BigDecimal.ZERO, notReadySummary.get(0).getActualRent());
+        assertNotEquals(BigDecimal.ZERO, notReadySummary.get(0).getMarketRent());
+        assertNotEquals(BigDecimal.ZERO, readySummary.get(0).getActualRent());
+        assertNotEquals(BigDecimal.ZERO, readySummary.get(0).getMarketRent());
+
+        // test year 1
+        var year1Ready = readySummary.get(0);
+        assertEquals(0, year1Ready.getMarketRent().compareTo(BigDecimal.valueOf(7715.61)));
+        assertEquals(0, year1Ready.getActualRent().compareTo(BigDecimal.valueOf(6000)));
+        assertEquals(0, year1Ready.getFiscalMarketRent().compareTo(BigDecimal.valueOf(11435.8881)));
+        assertEquals(0, year1Ready.getFiscalActualRent().compareTo(BigDecimal.valueOf(8000)));
+        var year1NotReady = notReadySummary.get(0);
+        assertEquals(0, year1NotReady.getMarketRent().compareTo(BigDecimal.valueOf(30862.44)));
+        assertEquals(0, year1NotReady.getActualRent().compareTo(BigDecimal.valueOf(12000)));
+        assertEquals(0, year1NotReady.getFiscalMarketRent().compareTo(BigDecimal.valueOf(45743.5524)));
+        assertEquals(0, year1NotReady.getFiscalActualRent().compareTo(BigDecimal.valueOf(16000)));
+
+        // test year 1
+        var year2Ready = readySummary.get(1);
+        assertEquals(0, year2Ready.getMarketRent().compareTo(BigDecimal.valueOf(7715.61)));
+        assertEquals(0, year2Ready.getActualRent().compareTo(BigDecimal.valueOf(6000)));
+        assertEquals(0, year2Ready.getFiscalMarketRent().compareTo(BigDecimal.valueOf(11435.8881)));
+        assertEquals(0, year2Ready.getFiscalActualRent().compareTo(BigDecimal.valueOf(8000)));
+        var year2NotReady = notReadySummary.get(1);
+        assertEquals(0, year2NotReady.getMarketRent().compareTo(BigDecimal.valueOf(30862.44)));
+        assertEquals(0, year2NotReady.getActualRent().compareTo(BigDecimal.valueOf(12000)));
+        assertEquals(0, year2NotReady.getFiscalMarketRent().compareTo(BigDecimal.valueOf(45743.5524)));
+        assertEquals(0, year2NotReady.getFiscalActualRent().compareTo(BigDecimal.valueOf(16000)));
+    }
+
     @Test
     public void multipleUnitsMonthlySummaryCorrectAddition() {
         var request = createMarketRentRequest(
                 UnitTypeForecast.builder()
                         .unitType(UNIT_TYPE_1BR_1BATH)
                         .unitDetails(Map.of(
-                                UNIT_101, UnitDetails.builder().unitStatus("READY").startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build(),
-                                UNIT_102, UnitDetails.builder().unitStatus("NOT READY").startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build(),
-                                "103", UnitDetails.builder().unitStatus("NOT READY").startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build()
+                                UNIT_101, UnitDetails.builder().unitStatus(READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build(),
+                                UNIT_102, UnitDetails.builder().unitStatus(NOT_READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build(),
+                                "103", UnitDetails.builder().unitStatus(NOT_READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build()
 
                         ))
                         .forecastMonthData(List.of(

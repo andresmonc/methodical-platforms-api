@@ -16,8 +16,10 @@ import java.math.BigDecimal;
 public class RentForecastMonth {
     private int year;
     private int month;
-    private BigDecimal marketRent;
-    private BigDecimal actualRent;
+    @Builder.Default
+    private BigDecimal marketRent = BigDecimal.ZERO;
+    @Builder.Default
+    private BigDecimal actualRent = BigDecimal.ZERO;
 }
 
 
