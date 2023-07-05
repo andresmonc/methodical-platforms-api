@@ -41,11 +41,7 @@ class RentForecastServiceTest {
         var request = createMarketRentRequest(
                 UnitTypeForecast.builder()
                         .unitType(UNIT_TYPE_1BR_1BATH)
-                        .unitDetails(Map.of(UNIT_101, UnitDetails.builder()
-                                .contractTerm(6).startingMarketRent(BigDecimal.valueOf(1000))
-                                        .startDate(LocalDate.of(2020,1,1))
-                                .startingActualRent(BigDecimal.valueOf(700)).build())
-                        )
+                        .unitDetails(Map.of(UNIT_101, createUnitDetails(6, "", 1000, 700, LocalDate.of(2020, 1, 1))))
                         .excessRentAdjustmentRate(BigDecimal.valueOf(.15))
                         .forecastMonthData(forecastMonthTestData())
                         .build()
@@ -86,7 +82,7 @@ class RentForecastServiceTest {
                 // First Unit
                 UnitTypeForecast.builder()
                         .unitType(UNIT_TYPE_1BR_1BATH)
-                        .unitDetails(Map.of(UNIT_101, UnitDetails.builder().startingMarketRent(BigDecimal.valueOf(1000)).build()))
+                        .unitDetails(Map.of(UNIT_101, createUnitDetails(0, "", 1000, 0)))
                         .forecastMonthData(List.of(
                                 createForecastMonth(0, 0, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
                                 createForecastMonth(0, 1, BigDecimal.ZERO, BigDecimal.valueOf(.10)),
@@ -96,7 +92,7 @@ class RentForecastServiceTest {
                 // Second Unit
                 UnitTypeForecast.builder()
                         .unitType(unitType2)
-                        .unitDetails(Map.of("102", UnitDetails.builder().startingMarketRent(BigDecimal.valueOf(2000)).build()))
+                        .unitDetails(Map.of("102", createUnitDetails(0, "", 2000, 0)))
                         .forecastMonthData(List.of(
                                 createForecastMonth(0, 0, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
                                 createForecastMonth(0, 1, BigDecimal.ZERO, BigDecimal.valueOf(.10)),
@@ -125,7 +121,7 @@ class RentForecastServiceTest {
         var request = createMarketRentRequest(
                 UnitTypeForecast.builder()
                         .unitType(unitType)
-                        .unitDetails(Map.of(UNIT_101, UnitDetails.builder().startingMarketRent(BigDecimal.valueOf(1000)).build()))
+                        .unitDetails(Map.of(UNIT_101, createUnitDetails(0, "", 1000, 0)))
                         .forecastMonthData(
                                 List.of(
                                         createForecastMonth(0, 0, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
@@ -153,10 +149,7 @@ class RentForecastServiceTest {
         var request = createMarketRentRequest(
                 UnitTypeForecast.builder()
                         .unitType(UNIT_TYPE_1BR_1BATH)
-                        .unitDetails(Map.of(UNIT_101, UnitDetails.builder()
-                                .contractTerm(6).startingMarketRent(BigDecimal.valueOf(1000))
-                                .startDate(LocalDate.of(2023, 8, 15))
-                                .startingActualRent(BigDecimal.valueOf(700)).build())
+                        .unitDetails(Map.of(UNIT_101, createUnitDetails(6, "", 1000, 700, LocalDate.of(2023, 8, 15)))
                         )
                         .excessRentAdjustmentRate(BigDecimal.valueOf(.15))
                         .forecastMonthData(forecastMonthTestData())
@@ -191,7 +184,7 @@ class RentForecastServiceTest {
         var request = createMarketRentRequest(
                 UnitTypeForecast.builder()
                         .unitType(unitType1)
-                        .unitDetails(Map.of("101", UnitDetails.builder().startingMarketRent(BigDecimal.valueOf(1000)).build()))
+                        .unitDetails(Map.of("101", createUnitDetails(0, "", 1000, 0)))
                         .forecastMonthData(List.of(
                                 // First Unit
                                 createForecastMonth(0, 1, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
@@ -201,7 +194,7 @@ class RentForecastServiceTest {
                         )).build(),
                 UnitTypeForecast.builder()
                         .unitType(unitType2)
-                        .unitDetails(Map.of(UNIT_102, UnitDetails.builder().startingMarketRent(BigDecimal.valueOf(2000)).build()))
+                        .unitDetails(Map.of(UNIT_102, createUnitDetails(0, "", 2000, 0)))
                         .forecastMonthData(List.of(
                                 // Second Unit
                                 createForecastMonth(0, 1, BigDecimal.valueOf(.10), BigDecimal.valueOf(.10)),
@@ -232,9 +225,9 @@ class RentForecastServiceTest {
                 UnitTypeForecast.builder()
                         .unitType(UNIT_TYPE_1BR_1BATH)
                         .unitDetails(Map.of(
-                                UNIT_101, UnitDetails.builder().unitStatus(READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(1000)).build(),
-                                UNIT_102, UnitDetails.builder().unitStatus(NOT_READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build(),
-                                "103", UnitDetails.builder().unitStatus(NOT_READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build()
+                                UNIT_101, createUnitDetails(0, READY, 1000, 1000),
+                                UNIT_102, createUnitDetails(0, NOT_READY, 2000, 1000),
+                                "103", createUnitDetails(0, NOT_READY, 2000, 1000)
 
                         ))
                         .forecastMonthData(List.of(
@@ -273,9 +266,9 @@ class RentForecastServiceTest {
                 UnitTypeForecast.builder()
                         .unitType(UNIT_TYPE_1BR_1BATH)
                         .unitDetails(Map.of(
-                                UNIT_101, UnitDetails.builder().unitStatus(READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(1000)).build(),
-                                UNIT_102, UnitDetails.builder().unitStatus(NOT_READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build(),
-                                "103", UnitDetails.builder().unitStatus(NOT_READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build()
+                                UNIT_101, createUnitDetails(0, READY, 1000, 1000),
+                                UNIT_102, createUnitDetails(0, NOT_READY, 2000, 1000),
+                                "103", createUnitDetails(0, NOT_READY, 2000, 1000)
 
                         ))
                         .forecastMonthData(List.of(
@@ -333,9 +326,9 @@ class RentForecastServiceTest {
                 UnitTypeForecast.builder()
                         .unitType(UNIT_TYPE_1BR_1BATH)
                         .unitDetails(Map.of(
-                                UNIT_101, UnitDetails.builder().unitStatus(READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build(),
-                                UNIT_102, UnitDetails.builder().unitStatus(NOT_READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build(),
-                                "103", UnitDetails.builder().unitStatus(NOT_READY).startingActualRent(BigDecimal.valueOf(1000)).startingMarketRent(BigDecimal.valueOf(2000)).build()
+                                UNIT_101, createUnitDetails(0, READY, 2000, 1000),
+                                UNIT_102, createUnitDetails(0, NOT_READY, 2000, 1000),
+                                "103", createUnitDetails(0, NOT_READY, 2000, 1000)
 
                         ))
                         .forecastMonthData(List.of(
@@ -362,15 +355,9 @@ class RentForecastServiceTest {
                 UnitTypeForecast.builder()
                         .unitType(UNIT_TYPE_1BR_1BATH)
                         .unitDetails(Map.of(
-                                        UNIT_101, UnitDetails.builder()
-                                                .contractTerm(6).unitStatus("REHAB").startingMarketRent(BigDecimal.valueOf(6000))
-                                                .startingActualRent(BigDecimal.valueOf(700)).build(),
-                                        UNIT_102, UnitDetails.builder()
-                                                .contractTerm(6).unitStatus("REHAB").startingMarketRent(BigDecimal.valueOf(6000))
-                                                .startingActualRent(BigDecimal.valueOf(700)).build(),
-                                        "103", UnitDetails.builder()
-                                                .contractTerm(6).unitStatus("REHAB").startingMarketRent(BigDecimal.valueOf(6000))
-                                                .startingActualRent(BigDecimal.valueOf(700)).build()
+                                        UNIT_101, createUnitDetails(6, "REHAB", 6000, 700),
+                                        UNIT_102, createUnitDetails(6, "REHAB", 6000, 700),
+                                        "103", createUnitDetails(6, newConstruction, 6000, 700)
                                 )
                         )
                         .excessRentAdjustmentRate(BigDecimal.valueOf(.15))
@@ -379,12 +366,8 @@ class RentForecastServiceTest {
                 UnitTypeForecast.builder()
                         .unitType(fourBed)
                         .unitDetails(Map.of(
-                                        UNIT_101, UnitDetails.builder()
-                                                .contractTerm(6).unitStatus(newConstruction).startingMarketRent(BigDecimal.valueOf(56000))
-                                                .startingActualRent(BigDecimal.valueOf(700)).build(),
-                                        UNIT_102, UnitDetails.builder()
-                                                .contractTerm(6).unitStatus(newConstruction).startingMarketRent(BigDecimal.valueOf(56000))
-                                                .startingActualRent(BigDecimal.valueOf(700)).build()
+                                        UNIT_101, createUnitDetails(6, newConstruction, 56000, 700),
+                                        UNIT_102, createUnitDetails(6, newConstruction, 56000, 700)
                                 )
                         )
                         .forecastMonthData(forecastMonthTestData())
@@ -410,9 +393,7 @@ class RentForecastServiceTest {
                 UnitTypeForecast.builder()
                         .unitType(UNIT_TYPE_1BR_1BATH)
                         .unitDetails(Map.of(
-                                        UNIT_101, UnitDetails.builder()
-                                                .contractTerm(6).unitStatus("REHAB").startingMarketRent(BigDecimal.valueOf(6000))
-                                                .startingActualRent(BigDecimal.valueOf(700)).build()
+                                        UNIT_101, createUnitDetails(6, "REHAB", 6000, 700)
                                 )
                         )
                         .excessRentAdjustmentRate(BigDecimal.valueOf(.15))
@@ -448,6 +429,24 @@ class RentForecastServiceTest {
 
     private ForecastMonth createForecastMonth(int year, int month, BigDecimal marketEscalationRate, BigDecimal actualEscalationRate) {
         return ForecastMonth.builder().month(month).year(year).marketEscalationRate(marketEscalationRate).actualEscalationRate(actualEscalationRate).build();
+    }
+
+    private UnitDetails createUnitDetails(int contractTerm, String unitStatus, int startingMarketRent, int startingActualRent, LocalDate startDate) {
+        var unitDetails = createUnitDetails(contractTerm, unitStatus, startingMarketRent, startingActualRent);
+        unitDetails.setStartDate(startDate);
+        return unitDetails;
+    }
+
+
+    private UnitDetails createUnitDetails(int contractTerm, String unitStatus, int startingMarketRent, int startingActualRent) {
+        var unitDetails = new UnitDetails();
+        unitDetails.setUnitStatus(unitStatus);
+        if (contractTerm != 0) {
+            unitDetails.setContractTerm(contractTerm);
+        }
+        unitDetails.setStartingActualRent(BigDecimal.valueOf(startingActualRent));
+        unitDetails.setStartingMarketRent(BigDecimal.valueOf(startingMarketRent));
+        return unitDetails;
     }
 
     private List<ForecastMonth> forecastMonthTestData() {
