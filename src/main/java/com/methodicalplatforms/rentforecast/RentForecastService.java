@@ -154,45 +154,52 @@ public class RentForecastService {
                 }
             }
 
-            BigDecimal currentMonthActualEscalationRate = BigDecimal.ONE;
-            // Only escalate actual if it's the month after contract end
-            if (unitStarted && (isEscalationMonthForActual(unitDetails, month, year, closingDate) || isUnitStartMonth)) {
-                currentMonthActualEscalationRate = compoundedActualEscalationRate;
-            }
-
-            // Forecast rents for month in question
-            BigDecimal forecastedActualRent = BigDecimal.ZERO;
-            BigDecimal forecastedMarketRent = BigDecimal.ZERO;
-            if (isUnitStartMonth) {
-                forecastedActualRent = Objects.requireNonNullElse(unitDetails.getStartingActualRent(), BigDecimal.ZERO);
-            } else if (unitStarted) {
-                forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(unitDetails.getStartingActualRent(), actualRent, currentMonthActualEscalationRate);
-
-            }
-
-            if (propertyStarted && BigDecimal.ZERO.compareTo(marketRent) == 0) {
-                forecastedMarketRent = Objects.requireNonNullElse(unitDetails.getStartingMarketRent(), BigDecimal.ZERO);
-            } else if (propertyStarted) {
-                forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(marketEscalationRate, marketRent, forecastedActualRent, excessRentAdjustmentRate);
-            }
-
-
-            // Compound actual escalation and determine actual escalation rate for next month
-            compoundedActualEscalationRate = compoundedActualEscalationRate
-                    .multiply(BigDecimal.ONE.add(
-                                    Objects.requireNonNullElse(forecastMonth.getActualEscalationRate(), BigDecimal.ZERO)
-                            )
-                    );
-
-            // We want to escalate the market rents the following month, last month/last year discarded if it exists
-            marketEscalationRate = BigDecimal.ONE.add(forecastMonth.getMarketEscalationRate());
-
-            // Update the tracker for current market rents for the unit type
+            BigDecimal currentMonthActualEscalationRate = getCurrentMonthActualEscalationRate(unitStarted, isEscalationMonthForActual(unitDetails, month, year, closingDate), isUnitStartMonth, compoundedActualEscalationRate);
+            BigDecimal forecastedActualRent = calculateForecastedActualRent(isUnitStartMonth, unitStarted, unitDetails.getStartingActualRent(), actualRent, currentMonthActualEscalationRate);
+            BigDecimal forecastedMarketRent = calculateForecastedMarketRent(propertyStarted, marketRent, unitDetails.getStartingMarketRent(), marketEscalationRate, forecastedActualRent, excessRentAdjustmentRate);
+            compoundedActualEscalationRate = calculateCompoundedActualEscalationRate(compoundedActualEscalationRate, forecastMonth.getActualEscalationRate());
+            marketEscalationRate = calculateMarketEscalationRate(forecastMonth.getMarketEscalationRate());
             forecastedRentsByMonth.add(newRentForecastMonth(year, month, setScale(forecastedMarketRent), setScale(forecastedActualRent)));
             marketRent = forecastedMarketRent;
             actualRent = forecastedActualRent;
         }
         return forecastedRentsByMonth;
+    }
+
+    private BigDecimal getCurrentMonthActualEscalationRate(boolean unitStarted, boolean isEscalationMonthForActual, boolean isUnitStartMonth, BigDecimal compoundedActualEscalationRate) {
+        BigDecimal currentMonthActualEscalationRate = BigDecimal.ONE;
+        if (unitStarted && (isEscalationMonthForActual || isUnitStartMonth)) {
+            currentMonthActualEscalationRate = compoundedActualEscalationRate;
+        }
+        return currentMonthActualEscalationRate;
+    }
+
+    private BigDecimal calculateForecastedActualRent(boolean isUnitStartMonth, boolean unitStarted, BigDecimal startingActualRent, BigDecimal actualRent, BigDecimal currentMonthActualEscalationRate) {
+        BigDecimal forecastedActualRent = BigDecimal.ZERO;
+        if (isUnitStartMonth) {
+            forecastedActualRent = Objects.requireNonNullElse(startingActualRent, BigDecimal.ZERO);
+        } else if (unitStarted) {
+            forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(startingActualRent, actualRent, currentMonthActualEscalationRate);
+        }
+        return forecastedActualRent;
+    }
+
+    private BigDecimal calculateForecastedMarketRent(boolean propertyStarted, BigDecimal marketRent, BigDecimal startingMarketRent, BigDecimal marketEscalationRate, BigDecimal forecastedActualRent, BigDecimal excessRentAdjustmentRate) {
+        BigDecimal forecastedMarketRent = BigDecimal.ZERO;
+        if (propertyStarted && BigDecimal.ZERO.compareTo(marketRent) == 0) {
+            forecastedMarketRent = Objects.requireNonNullElse(startingMarketRent, BigDecimal.ZERO);
+        } else if (propertyStarted) {
+            forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(marketEscalationRate, marketRent, forecastedActualRent, excessRentAdjustmentRate);
+        }
+        return forecastedMarketRent;
+    }
+
+    private BigDecimal calculateCompoundedActualEscalationRate(BigDecimal compoundedActualEscalationRate, BigDecimal actualEscalationRate) {
+        return compoundedActualEscalationRate.multiply(BigDecimal.ONE.add(Objects.requireNonNullElse(actualEscalationRate, BigDecimal.ZERO)));
+    }
+
+    private BigDecimal calculateMarketEscalationRate(BigDecimal marketEscalationRate) {
+        return BigDecimal.ONE.add(marketEscalationRate);
     }
 
     private RentForecastMonth newRentForecastMonth(int year, int month, BigDecimal marketRent, BigDecimal actualRent) {
