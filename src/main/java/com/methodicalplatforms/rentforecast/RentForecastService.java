@@ -19,6 +19,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -133,13 +134,13 @@ public class RentForecastService {
         BigDecimal compoundedActualEscalationRate = BigDecimal.ONE;
         BigDecimal marketEscalationRate = BigDecimal.ONE;
         boolean unitStarted = false;
-
+        boolean propertyStarted = false;
 
         for (ForecastMonth forecastMonth : forecastMonths) {
             // Get current month
             int month = forecastMonth.getMonth();
             int year = forecastMonth.getYear();
-            boolean isStartMonth = isStartMonth(unitDetails, month, year, closingDate);
+            boolean isUnitStartMonth = isStartMonth(unitDetails, month, year, closingDate);
 
             if (!unitStarted) {
                 if (isUnitStarted(forecastMonth, closingDate, unitDetails.getStartDate())) {
@@ -147,20 +148,31 @@ public class RentForecastService {
                 }
             }
 
+            if (!propertyStarted) {
+                if (isPropertyStarted(forecastMonth, closingDate)) {
+                    propertyStarted = true;
+                }
+            }
+
             BigDecimal currentMonthActualEscalationRate = BigDecimal.ONE;
             // Only escalate actual if it's the month after contract end
-            if (unitStarted && (isEscalationMonthForActual(unitDetails, month, year, closingDate) || isStartMonth)) {
+            if (unitStarted && (isEscalationMonthForActual(unitDetails, month, year, closingDate) || isUnitStartMonth)) {
                 currentMonthActualEscalationRate = compoundedActualEscalationRate;
             }
 
             // Forecast rents for month in question
             BigDecimal forecastedActualRent = BigDecimal.ZERO;
             BigDecimal forecastedMarketRent = BigDecimal.ZERO;
-            if (isStartMonth) {
+            if (isUnitStartMonth) {
                 forecastedActualRent = Objects.requireNonNullElse(unitDetails.getStartingActualRent(), BigDecimal.ZERO);
-                forecastedMarketRent = Objects.requireNonNullElse(unitDetails.getStartingMarketRent(), BigDecimal.ZERO);
             } else if (unitStarted) {
                 forecastedActualRent = actualRentForecastService.calculateActualRentForMonth(unitDetails.getStartingActualRent(), actualRent, currentMonthActualEscalationRate);
+
+            }
+
+            if (propertyStarted && BigDecimal.ZERO.compareTo(marketRent) == 0) {
+                forecastedMarketRent = Objects.requireNonNullElse(unitDetails.getStartingMarketRent(), BigDecimal.ZERO);
+            } else if (propertyStarted) {
                 forecastedMarketRent = marketRentForecastService.calculateMarketRentForMonth(marketEscalationRate, marketRent, forecastedActualRent, excessRentAdjustmentRate);
             }
 
@@ -245,6 +257,20 @@ public class RentForecastService {
         );
         return monthsBetween == -1;
     }
+
+    private boolean isPropertyStarted(ForecastMonth forecastMonth, LocalDate closingDate) {
+        if (closingDate == null) {
+            return true;
+        }
+
+        LocalDate calcDate = closingDate.withMonth(forecastMonth.getMonth())
+                .plusYears(forecastMonth.getYear() - 1);
+        closingDate = closingDate.with(TemporalAdjusters.lastDayOfMonth());
+        LocalDate calcDateLastDayOfMonth = calcDate.withDayOfMonth(calcDate.lengthOfMonth())
+                .with(TemporalAdjusters.lastDayOfMonth()); // Set to last day of the month
+        return calcDateLastDayOfMonth.isAfter(closingDate);
+    }
+
 
     /**
      * Determine whether the unit is already started

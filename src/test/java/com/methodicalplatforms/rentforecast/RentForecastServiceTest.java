@@ -167,9 +167,9 @@ class RentForecastServiceTest {
         assertEquals(0, BigDecimal.valueOf(0).compareTo(forecastMonths.get(4).getMarketRent()));
         assertEquals(2, forecastMonths.get(1).getMonth(), "Response is not sorted");
         assertEquals(0, BigDecimal.ZERO.compareTo(forecastMonths.get(7).getActualRent()));
-        assertEquals(0, BigDecimal.valueOf(1000.00).compareTo(forecastMonths.get(8).getMarketRent()));
+        assertEquals(0, BigDecimal.valueOf(1050.00).compareTo(forecastMonths.get(8).getMarketRent()));
         assertEquals(0, BigDecimal.valueOf(700).compareTo(forecastMonths.get(11).getActualRent()));
-        assertEquals(0, BigDecimal.valueOf(1040).compareTo(forecastMonths.get(12).getMarketRent()));
+        assertEquals(0, BigDecimal.valueOf(1092).compareTo(forecastMonths.get(12).getMarketRent()));
         assertEquals(0, BigDecimal.valueOf(1599.42).compareTo(forecastMonths.get(16).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
         assertEquals(0, BigDecimal.valueOf(1537.90).compareTo(forecastMonths.get(15).getActualRent()));
         assertEquals(0, BigDecimal.valueOf(1663.39).compareTo(forecastMonths.get(20).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
