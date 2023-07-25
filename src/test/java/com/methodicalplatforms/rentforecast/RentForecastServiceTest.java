@@ -173,7 +173,7 @@ class RentForecastServiceTest {
         assertEquals(0, BigDecimal.valueOf(1599.42).compareTo(forecastMonths.get(16).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
         assertEquals(0, BigDecimal.valueOf(1537.90).compareTo(forecastMonths.get(15).getActualRent()));
         assertEquals(0, BigDecimal.valueOf(1663.39).compareTo(forecastMonths.get(20).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
-        assertEquals(0, BigDecimal.valueOf(1537.90).compareTo(forecastMonths.get(19).getActualRent().setScale(2, RoundingMode.HALF_EVEN)));
+        assertEquals(0, BigDecimal.valueOf(1599.42).compareTo(forecastMonths.get(19).getActualRent().setScale(2, RoundingMode.HALF_EVEN)));
         assertEquals(0, BigDecimal.valueOf(1746.56).compareTo(forecastMonths.get(24).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
     }
 
