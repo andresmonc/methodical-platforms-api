@@ -230,13 +230,16 @@ public class RentForecastService {
             // this works because our array is 0 indexed, so if we renew every 6 months, index 6 would actually be the 7th month
             return unitDetails.getContractTerm() != null && (currentMonth % unitDetails.getContractTerm()) == 0;
         }
-        LocalDate currentDate = LocalDate.of(closingDate.getYear() + currentYear, currentMonth, 1);
+        LocalDate currentDate = LocalDate.of(closingDate.getYear() + currentYear - 1, currentMonth, 1);
         long monthsBetween = ChronoUnit.MONTHS.between(
-                YearMonth.from(currentDate),
-                YearMonth.from(unitDetails.getStartDate()
-                )
+                YearMonth.from(unitDetails.getStartDate()),
+                YearMonth.from(currentDate)
         );
-        long remainder = monthsBetween % unitDetails.getContractTerm() + 1;
+        // If the unit start date hasn't occurred yet
+        if (monthsBetween < 0) {
+            return false;
+        }
+        long remainder = monthsBetween % unitDetails.getContractTerm();
         return remainder == 0;
     }
 
