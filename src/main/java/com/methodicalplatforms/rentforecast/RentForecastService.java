@@ -237,7 +237,7 @@ public class RentForecastService {
                 )
         );
         long remainder = monthsBetween % unitDetails.getContractTerm() + 1;
-        return remainder == -1;
+        return remainder == 0;
     }
 
     /**
