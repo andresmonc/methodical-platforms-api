@@ -237,7 +237,7 @@ public class RentForecastService {
                 )
         );
         long remainder = monthsBetween % unitDetails.getContractTerm() + 1;
-        return remainder == 0;
+        return remainder == -1;
     }
 
     /**
@@ -262,7 +262,7 @@ public class RentForecastService {
                 YearMonth.from(currentDate),
                 YearMonth.from(startDate)
         );
-        return monthsBetween == -1;
+        return monthsBetween == 0;
     }
 
     private boolean isPropertyStarted(ForecastMonth forecastMonth, LocalDate closingDate) {

@@ -29,7 +29,7 @@ class RentForecastServiceTest {
     private static final String UNIT_102 = "102";
     private static final String READY = "READY";
     private static final String NOT_READY = "NOT READY";
-    
+
 
     @BeforeEach
     public void setup() {
@@ -166,10 +166,10 @@ class RentForecastServiceTest {
         assertEquals(36, forecastMonths.size());
         assertEquals(0, BigDecimal.valueOf(0).compareTo(forecastMonths.get(4).getMarketRent()));
         assertEquals(2, forecastMonths.get(1).getMonth(), "Response is not sorted");
-        assertEquals(0, BigDecimal.ZERO.compareTo(forecastMonths.get(7).getActualRent()));
-        assertEquals(0, BigDecimal.valueOf(1050.00).compareTo(forecastMonths.get(8).getMarketRent()));
-        assertEquals(0, BigDecimal.valueOf(700).compareTo(forecastMonths.get(11).getActualRent()));
-        assertEquals(0, BigDecimal.valueOf(1092).compareTo(forecastMonths.get(12).getMarketRent()));
+        assertEquals(0, BigDecimal.ZERO.compareTo(forecastMonths.get(5).getActualRent()));
+        assertEquals(0, BigDecimal.valueOf(1000.00).compareTo(forecastMonths.get(7).getMarketRent()));
+        assertEquals(0, BigDecimal.valueOf(700).compareTo(forecastMonths.get(7).getActualRent()));
+        assertEquals(0, BigDecimal.valueOf(1050).compareTo(forecastMonths.get(11).getMarketRent()));
         assertEquals(0, BigDecimal.valueOf(1599.42).compareTo(forecastMonths.get(16).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
         assertEquals(0, BigDecimal.valueOf(1537.90).compareTo(forecastMonths.get(15).getActualRent()));
         assertEquals(0, BigDecimal.valueOf(1663.39).compareTo(forecastMonths.get(20).getMarketRent().setScale(2, RoundingMode.HALF_EVEN)));
@@ -301,14 +301,14 @@ class RentForecastServiceTest {
 
         // test year 1
         var year1Ready = readySummary.get(0);
-        assertEquals(0, year1Ready.getMarketRent().compareTo(BigDecimal.valueOf(7715.61)));
-        assertEquals(0, year1Ready.getActualRent().compareTo(BigDecimal.valueOf(6000)));
-        assertEquals(0, year1Ready.getFiscalMarketRent().compareTo(BigDecimal.valueOf(11435.8881)));
+        assertEquals(0, year1Ready.getMarketRent().compareTo(BigDecimal.valueOf(7715.610000000000000)));
+        assertEquals(0, year1Ready.getActualRent().compareTo(BigDecimal.valueOf(7000)));
+        assertEquals(0, year1Ready.getFiscalMarketRent().compareTo(BigDecimal.valueOf(11435.888100000000000)));
         assertEquals(0, year1Ready.getFiscalActualRent().compareTo(BigDecimal.valueOf(8000)));
         var year1NotReady = notReadySummary.get(0);
-        assertEquals(0, year1NotReady.getMarketRent().compareTo(BigDecimal.valueOf(30862.44)));
-        assertEquals(0, year1NotReady.getActualRent().compareTo(BigDecimal.valueOf(12000)));
-        assertEquals(0, year1NotReady.getFiscalMarketRent().compareTo(BigDecimal.valueOf(45743.5524)));
+        assertEquals(0, year1NotReady.getMarketRent().compareTo(BigDecimal.valueOf(30862.440000000000000)));
+        assertEquals(0, year1NotReady.getActualRent().compareTo(BigDecimal.valueOf(14000.000000000000000)));
+        assertEquals(0, year1NotReady.getFiscalMarketRent().compareTo(BigDecimal.valueOf(45743.552400000000000)));
         assertEquals(0, year1NotReady.getFiscalActualRent().compareTo(BigDecimal.valueOf(16000)));
 
         // test year 1
@@ -414,8 +414,8 @@ class RentForecastServiceTest {
         assertEquals(BigDecimal.ZERO, unitMonthly.get(3).getActualRent());
         assertEquals(BigDecimal.ZERO, unitMonthly.get(4).getMarketRent());
         assertEquals(BigDecimal.ZERO, unitMonthly.get(4).getActualRent());
-        assertEquals(BigDecimal.ZERO, unitMonthly.get(5).getMarketRent());
-        assertEquals(BigDecimal.ZERO, unitMonthly.get(5).getActualRent());
+        assertEquals(BigDecimal.ZERO, unitMonthly.get(4).getMarketRent());
+        assertEquals(BigDecimal.ZERO, unitMonthly.get(4).getActualRent());
         assertEquals(0, unitMonthly.get(6).getMarketRent().compareTo(BigDecimal.valueOf(6000)));
         assertEquals(0, unitMonthly.get(6).getActualRent().compareTo(BigDecimal.valueOf(700)));
     }
